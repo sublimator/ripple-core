@@ -39,8 +39,8 @@ const BinaryParser = makeClass({
   },
   end(customEnd) {
     const cursor = this.pos();
-    return cursor >= this._length || customEnd !== undefined &&
-            cursor >= customEnd;
+    return (cursor >= this._length) || (customEnd !== null &&
+            cursor >= customEnd);
   },
   readVL() {
     return this.read(this.readVLLength());
@@ -72,9 +72,8 @@ const BinaryParser = makeClass({
     return typeof type === 'string' ? this._parsers[type].fromParser(this) :
                                       type.fromParser(this);
   },
-  readFieldValue() {
-    const field = this.readField();
-    const kls = this._parsers[field.name] || this._parsers[field.type.name];
+  readFieldValue(field) {
+    const kls = this._parsers[field] || this._parsers[field.type];
     if (!kls) {
       throw new Error(`unsupported: (${field.name}, ${field.type.name})`);
     }
@@ -85,7 +84,11 @@ const BinaryParser = makeClass({
       throw new Error(
           `fromParser for (${field.name}, ${field.type.name}) -> undefined `);
     }
-    return [field, value];
+    return value;
+  },
+  readFieldAndValue() {
+    const field = this.readField();
+    return [field, this.readFieldValue(field)];
   }
 });
 

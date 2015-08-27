@@ -10,7 +10,27 @@ const {fields, Amount, Hash160} = index;
 
 const fixtures = loadFixture('data-driven-tests.json');
 
+function unused() {}
+
 function buildLookup() {
+  const LedgerEntryType = {
+    fromParser(parser) {
+      const lookup = {
+        a: 'AccountRoot',
+        d: 'DirectoryNode',
+        g: 'GeneratorMap',
+        r: 'RippleState',
+        o: 'Offer',
+        c: 'Contract',
+        h: 'LedgerHashes',
+        f: 'EnabledAmendments',
+        s: 'FeeSettings',
+        T: 'Ticket'
+      };
+      return lookup[String.fromCharCode(parser.readUInt16())];
+    }
+  };
+
   const TransactionType = {
     fromParser(parser) {
       return {0: 'Payment',
@@ -30,7 +50,16 @@ function buildLookup() {
             101: 'SetFee'}[parser.readUInt16() ];
     }
   };
-  return _.assign({TransactionType}, index);
+  return _.assign({LedgerEntryType, TransactionType}, index);
+}
+
+function readJSON(parser) {
+  const json = {};
+  while (!parser.end()) {
+    const [field, value] = parser.readFieldAndValue();
+    json[field] = value.toJSON ? value.toJSON() : value;
+  }
+  return json;
 }
 
 function toJSON(v) {
@@ -126,7 +155,7 @@ function transactionParsingTests() {
   it('can be done with high level apis', () => {
     const parser = makeParser(transaction.binary);
     function readField() {
-      return parser.readFieldValue();
+      return parser.readFieldAndValue();
     }
     assert.deepEqual(readField(), [fields.TransactionType, 'OfferCreate']);
     assert.deepEqual(readField(), [fields.Flags, 0]);
@@ -167,15 +196,7 @@ function transactionParsingTests() {
   });
   it('can be done with higher level apis', () => {
     const parser = makeParser(transaction.binary);
-    function readJSON() {
-      const json = {};
-      while (!parser.end()) {
-        const [field, value] = parser.readFieldValue();
-        json[field] = value.toJSON ? value.toJSON() : value;
-      }
-      return json;
-    }
-    const jsonFromBinary = readJSON();
+    const jsonFromBinary = readJSON(parser);
     assert.deepEqual(jsonFromBinary, tx_json);
   });
 }
@@ -189,7 +210,6 @@ function amountParsingTests() {
     const testName =
       `parses ${f.expected_hex.slice(0, 16)}...
           as ${JSON.stringify(f.test_json)}`;
-
     it(testName, () => {
       const value = parser.readType(Amount);
       // May not actually be in canonical form. The fixtures are to be used
@@ -212,7 +232,8 @@ function fieldParsingTests() {
 
 function nestedObjectTests() {
   function disabled(i) {
-    return _.includes([2], i);
+    unused(i);
+    return false; // !_.includes([2], i);
   }
 
   fixtures.whole_objects.forEach((f, i) => {
@@ -226,11 +247,15 @@ function nestedObjectTests() {
 
       let ix = 0;
       while (!parser.end()) {
-        const [field, value] = parser.readFieldValue();
+        const [field, value] = parser.readFieldAndValue();
+        if (value === null) {
+          continue;
+        }
+
         const expectedJSON = f.fields[ix][1].json;
         const expectedField = f.fields[ix][0];
-
         const actual = toJSON(value);
+
         try {
           assert.deepEqual(actual, expectedJSON);
         } catch (e) {
@@ -243,6 +268,89 @@ function nestedObjectTests() {
   });
 }
 
+function pathSetBinaryTests() {
+  const bytes = parseHexOnly(
+    `1200002200000000240000002E2E00004BF161D4C71AFD498D00000000000000
+     0000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA0
+     6594D168400000000000000A69D446F8038585E9400000000000000000000000
+     00425443000000000078CA21A6014541AB7B26C3929B9E0CD8C284D61C732103
+     A4665B1F0B7AE2BCA12E2DB80A192125BBEA660F80E9CEE137BA444C1B0769EC
+     7447304502205A964536805E35785C659D1F9670D057749AE39668175D6AA75D
+     25B218FE682E0221009252C0E5DDD5F2712A48F211669DE17B54113918E0D2C2
+     66F818095E9339D7D3811478CA21A6014541AB7B26C3929B9E0CD8C284D61C83
+     140A20B3C85F482532A9578DBB3950B85CA06594D1011231585E1F3BD02A15D6
+     185F8BB9B57CC60DEDDB37C10000000000000000000000004254430000000000
+     585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C131E4FE687C90257D3D2D694C
+     8531CDEECBE84F33670000000000000000000000004254430000000000E4FE68
+     7C90257D3D2D694C8531CDEECBE84F3367310A20B3C85F482532A9578DBB3950
+     B85CA06594D100000000000000000000000042544300000000000A20B3C85F48
+     2532A9578DBB3950B85CA06594D1300000000000000000000000005553440000
+     0000000A20B3C85F482532A9578DBB3950B85CA06594D1FF31585E1F3BD02A15
+     D6185F8BB9B57CC60DEDDB37C100000000000000000000000042544300000000
+     00585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C131E4FE687C90257D3D2D69
+     4C8531CDEECBE84F33670000000000000000000000004254430000000000E4FE
+     687C90257D3D2D694C8531CDEECBE84F33673115036E2D3F5437A83E5AC3CAEE
+     34FF2C21DEB618000000000000000000000000425443000000000015036E2D3F
+     5437A83E5AC3CAEE34FF2C21DEB6183000000000000000000000000055534400
+     000000000A20B3C85F482532A9578DBB3950B85CA06594D1FF31585E1F3BD02A
+     15D6185F8BB9B57CC60DEDDB37C1000000000000000000000000425443000000
+     0000585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C13157180C769B66D942EE
+     69E6DCC940CA48D82337AD000000000000000000000000425443000000000057
+     180C769B66D942EE69E6DCC940CA48D82337AD10000000000000000000000000
+     58525000000000003000000000000000000000000055534400000000000A20B3
+     C85F482532A9578DBB3950B85CA06594D100`);
+
+  const expectedJSON =
+    [[{account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+       currency: 'BTC',
+       issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+       type: 49},
+      {account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+       currency: 'BTC',
+       issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+       type: 49},
+      {account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+       currency: 'BTC',
+       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+       type: 49},
+      {currency: 'USD',
+       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+       type: 48}],
+     [{account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+       currency: 'BTC',
+       issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+       type: 49},
+      {account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+       currency: 'BTC',
+       issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+       type: 49},
+      {account: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi',
+       currency: 'BTC',
+       issuer: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi',
+       type: 49},
+      {currency: 'USD',
+       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+       type: 48}],
+     [{account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+       currency: 'BTC',
+       issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+       type: 49},
+      {account: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn',
+       currency: 'BTC',
+       issuer: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn',
+       type: 49},
+      {currency: '0000000000000000000000005852500000000000', type: 16},
+      {currency: 'USD',
+       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+       type: 48}]];
+
+  it('works with long paths', () => {
+    const parser = makeParser(bytes);
+    const txn = readJSON(parser);
+    assert.deepEqual(txn.Paths, expectedJSON);
+  });
+}
+
 function dataDrivenTests() {
   describe('Amount parsing tests', amountParsingTests);
   describe('Field Tests', fieldParsingTests);
@@ -250,6 +358,7 @@ function dataDrivenTests() {
 }
 
 describe('BinaryParser', function() {
+  describe('pathSetBinaryTests', pathSetBinaryTests);
   describe('Basic API', basicApiTests);
   describe('Parsing a transction', transactionParsingTests);
   describe('Data Driven Tests', dataDrivenTests);

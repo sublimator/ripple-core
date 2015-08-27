@@ -7,6 +7,9 @@ const {Currency} = require('./currency');
 const {Blob} = require('./blob');
 const {Amount} = require('./amount');
 const {UInt8, UInt16, UInt32, UInt64} = require('./uint');
+const {PathSet} = require('./path-set');
+const {STObject} = require('./st-object');
+const {STArray} = require('./st-array');
 
 module.exports = {
   AccountID,
@@ -21,5 +24,8 @@ module.exports = {
   UInt8,
   UInt16,
   UInt32,
-  UInt64
+  UInt64,
+  PathSet,
+  STObject,
+  STArray
 };
