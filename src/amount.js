@@ -1,6 +1,6 @@
 'use strict';
 
-const Decimal = require('Decimal.js');
+const Decimal = require('decimal.js');
 const makeClass = require('./extend-class');
 const {bytesToHex} = require('./bytes-utils');
 const {Currency} = require('./currency');
