@@ -5,8 +5,12 @@ const Decimal = require('decimal.js');
 const fs = require('fs');
 const {parseBytes} = require('../src/bytes-utils');
 
+function hexOnly(hex) {
+  return hex.replace(/[^a-fA-F0-9]/g, '');
+}
+
 function parseHexOnly(hex, to) {
-  return parseBytes(hex.replace(/[^a-fA-F0-9]/g, ''), to);
+  return parseBytes(hexOnly(hex), to);
 }
 
 function loadFixture(relativePath) {
@@ -29,6 +33,7 @@ function assertEqualAmountJSON(actual, expected) {
 }
 
 module.exports = {
+  hexOnly,
   parseHexOnly,
   loadFixture,
   assertEqualAmountJSON

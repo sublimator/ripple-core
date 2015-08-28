@@ -9,10 +9,12 @@ const assert = require('assert-diff');
 const {encodeAccountID} = require('ripple-address-codec');
 
 const {binary: {makeParser, readJSON}, Fields, Amount, Hash160} = coreTypes;
+const utils = require('./utils');
+const {parseHexOnly, assertEqualAmountJSON, hexOnly, loadFixture} = utils;
 const {bytesToHex} = require('../src/bytes-utils');
-const {parseHexOnly, assertEqualAmountJSON, loadFixture} = require('./utils');
 const fixtures = loadFixture('data-driven-tests.json');
 
+const __ = hexOnly;
 function unused() {}
 function toJSON(v) {
   return v.toJSON ? v.toJSON() : v;
@@ -39,7 +41,6 @@ function basicApiTests() {
 
 function transactionParsingTests() {
   const transaction = {
-    /* eslint-disable max-len */
     json: {
       'Account': 'raD5qJMAShLeHZXf9wjUmo6vRK4arj9cF3',
       'Fee': '10',
@@ -52,11 +53,12 @@ function transactionParsingTests() {
                    'value': '1694.768'},
       'TakerPays': '98957503520',
       'TransactionType': 'OfferCreate',
-      'TxnSignature':
-          '304502202ABE08D5E78D1E74A4C18F2714F64E87B8BD57444AFA5733109EB3C077077520022100DB335EE97386E4C0591CAC024D50E9230D8F171EEB901B5E5E4BD6D1E0AEF98C'
+      'TxnSignature': __(`
+          304502202ABE08D5E78D1E74A4C18F2714F64E87B8BD57444AF
+          A5733109EB3C077077520022100DB335EE97386E4C0591CAC02
+          4D50E9230D8F171EEB901B5E5E4BD6D1E0AEF98C`)
     },
-    /* eslint-disable max-len */
-    binary: parseHexOnly(`
+    binary: __(`
       120007220000000024000195F964400000170A53AC2065D5460561E
       C9DE000000000000000000000000000494C53000000000092D70596
       8936C419CE614BF264B5EEB1CEA47FF468400000000000000A73210
@@ -217,7 +219,7 @@ function nestedObjectTests() {
 }
 
 function pathSetBinaryTests() {
-  const bytes = parseHexOnly(
+  const bytes = __(
     `1200002200000000240000002E2E00004BF161D4C71AFD498D00000000000000
      0000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA0
      6594D168400000000000000A69D446F8038585E9400000000000000000000000
