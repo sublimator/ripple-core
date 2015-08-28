@@ -7,34 +7,13 @@ const {BinaryParser} = require('./binary-parser');
 const {Enums} = require('./binary-definitions');
 const types = require('./types');
 
-function buildEnumType(k, bytes) {
-  const enumMap = Enums[k];
-  const fromParser = parser => enumMap[parser.readUIntN(bytes)];
-  return {fromParser};
-}
-
-const TransactionResult = buildEnumType('TransactionResult', 1);
-const LedgerEntryType = buildEnumType('LedgerEntryType', 2);
-const TransactionType = buildEnumType('TransactionType', 2);
-const lookup = {TransactionResult, LedgerEntryType, TransactionType};
-_.assign(lookup, types);
-
-function toJSON(v) {
-  return v.toJSON ? v.toJSON() : v;
-}
-
-function readJSON(parser) {
-  const json = {};
-  while (!parser.end()) {
-    const [field, value] = parser.readFieldAndValue();
-    json[field] = toJSON(value);
-  }
-  return json;
-}
-
-function makeParser(bytes) {
-  return new BinaryParser(bytes, lookup);
-}
+const widths = {TransactionResult: 1, LedgerEntryType: 2, TransactionType: 2};
+const parserType = f => ({fromParser: (p) => f(p)});
+const enumType = (k, n, map = Enums[k]) => parserType(p => map[p.readUIntN(n)]);
+const accumulator = (to, n, k) => to[k] = enumType(k, n);
+const lookup = _.assign(_.transform(widths, accumulator, types));
+const makeParser = bytes => new BinaryParser(bytes, lookup);
+const readJSON = parser => parser.readType(types.STObject).toJSON();
 
 module.exports = {
   makeParser,
