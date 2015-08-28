@@ -2,48 +2,20 @@
 
 'use strict';
 
+const coreTypes = require('../src');
+
 const _ = require('lodash');
 const assert = require('assert-diff');
-const {BinaryParser} = require('../src/binary-parser');
-const {bytesToHex} = require('../src/bytes-utils');
 const {encodeAccountID} = require('ripple-address-codec');
-const {parseHexOnly, assertEqualAmountJSON, loadFixture} = require('./utils');
-const index = require('../src');
-const {Fields, Enums, Amount, Hash160} = index;
 
+const {binary: {makeParser, readJSON}, Fields, Amount, Hash160} = coreTypes;
+const {bytesToHex} = require('../src/bytes-utils');
+const {parseHexOnly, assertEqualAmountJSON, loadFixture} = require('./utils');
 const fixtures = loadFixture('data-driven-tests.json');
 
 function unused() {}
-
-function buildEnumType(k, bytes) {
-  const enumMap = Enums[k];
-  const fromParser = parser => enumMap[parser.readUIntN(bytes)];
-  return {fromParser};
-}
-
-function buildLookup() {
-  const TransactionResult = buildEnumType('TransactionResult', 1);
-  const LedgerEntryType = buildEnumType('LedgerEntryType', 2);
-  const TransactionType = buildEnumType('TransactionType', 2);
-  const enums = {TransactionResult, LedgerEntryType, TransactionType};
-  return _.assign(enums, index);
-}
-
-function readJSON(parser) {
-  const json = {};
-  while (!parser.end()) {
-    const [field, value] = parser.readFieldAndValue();
-    json[field] = value.toJSON ? value.toJSON() : value;
-  }
-  return json;
-}
-
 function toJSON(v) {
   return v.toJSON ? v.toJSON() : v;
-}
-
-function makeParser(bytes) {
-  return new BinaryParser(bytes, buildLookup());
 }
 
 function basicApiTests() {
