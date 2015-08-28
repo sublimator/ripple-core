@@ -1,6 +1,8 @@
 'use strict';
 
-const {Hash, Hash160, Hash128, Hash256} = require('./hash');
+const {Hash128} = require('./hash-128');
+const {Hash160} = require('./hash-160');
+const {Hash256} = require('./hash-256');
 const {AccountID} = require('./account-id');
 const {Currency} = require('./currency');
 const {Blob} = require('./blob');
@@ -16,7 +18,6 @@ module.exports = {
   Amount,
   Blob,
   Currency,
-  Hash,
   Hash128,
   Hash160,
   Hash256,

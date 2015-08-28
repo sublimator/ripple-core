@@ -12,12 +12,14 @@ const TYPE_CURRENCY = 0x10;
 const TYPE_ISSUER = 0x20;
 
 const Hop = makeClass({
-  type() {
-    let type = 0;
-    this.account && (type += TYPE_ACCOUNT);
-    this.issuer && (type += TYPE_ISSUER);
-    this.currency && (type += TYPE_CURRENCY);
-    return type;
+  static: {
+    parse(parser, type) {
+      const hop = new Hop();
+      (type & TYPE_ACCOUNT) && (hop.account = AccountID.fromParser(parser));
+      (type & TYPE_CURRENCY) && (hop.currency = Currency.fromParser(parser));
+      (type & TYPE_ISSUER) && (hop.issuer = AccountID.fromParser(parser));
+      return hop;
+    }
   },
   toJSON() {
     const type = this.type();
@@ -27,14 +29,12 @@ const Hop = makeClass({
     (type & TYPE_CURRENCY) && (ret.currency = this.currency.toJSON());
     return ret;
   },
-  static: {
-    parse(parser, type) {
-      const hop = new Hop();
-      (type & TYPE_ACCOUNT) && (hop.account = AccountID.fromParser(parser));
-      (type & TYPE_CURRENCY) && (hop.currency = Currency.fromParser(parser));
-      (type & TYPE_ISSUER) && (hop.issuer = AccountID.fromParser(parser));
-      return hop;
-    }
+  type() {
+    let type = 0;
+    this.account && (type += TYPE_ACCOUNT);
+    this.issuer && (type += TYPE_ISSUER);
+    this.currency && (type += TYPE_CURRENCY);
+    return type;
   }
 });
 

@@ -33,6 +33,7 @@ const Amount = makeClass({
         const issuer = parser.readType(AccountID);
         const exponent = ((b1 & 0x3F) << 2) + ((b2 & 0xff) >> 6) - 97;
         mantissa[1] &= 0x3F;
+        // decimal.js won't accept e notation with hex
         const value = new Decimal(sign + bytesToHex(mantissa), 16)
                                  .times('1e' + exponent);
         return new this(value, currency, issuer);
