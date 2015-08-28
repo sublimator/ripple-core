@@ -62,3 +62,7 @@ out/
 scripts/cache
 
 eslintrc
+.eslintrc
+
+# Large ledger dumps
+test/fixtures/as-ledger-4320278.json

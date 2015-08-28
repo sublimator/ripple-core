@@ -6,6 +6,11 @@ const {bytesToHex} = require('./bytes-utils');
 const {Currency} = require('./currency');
 const {AccountID} = require('./account-id');
 
+Decimal.config({
+  toExpPos: 32,
+  toExpNeg: -32
+});
+
 const Amount = makeClass({
   Amount(value, currency, issuer) {
     this.value = value;

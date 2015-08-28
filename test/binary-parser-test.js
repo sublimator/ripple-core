@@ -351,7 +351,20 @@ function pathSetBinaryTests() {
   });
 }
 
+function parseLedger4320278() {
+  const json = loadFixture('as-ledger-4320278.json');
+  json.forEach((e) => {
+    it(`can parse object ${e.index}`, () => {
+      const actual = readJSON(makeParser(e.binary));
+      const expected = e.json;
+      actual.index = expected.index;
+      assert.deepEqual(actual, expected);
+    });
+  });
+}
+
 function dataDrivenTests() {
+  unused('as-ledger-4320278.json', parseLedger4320278);
   describe('Amount parsing tests', amountParsingTests);
   describe('Field Tests', fieldParsingTests);
   describe('Parsing nested objects', nestedObjectTests);

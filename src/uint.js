@@ -2,6 +2,7 @@
 
 const BN = require('bn.js');
 const makeClass = require('./extend-class');
+const {bytesToHex} = require('./bytes-utils');
 
 const UInt = makeClass({
   static: {
@@ -10,7 +11,7 @@ const UInt = makeClass({
       return value;
     },
     fromBytes(bytes) {
-      return new BN(bytes);
+      return new this(bytes);
     },
     fromParser(parser) {
       if (this.width === 8) {
@@ -35,7 +36,16 @@ const UInt32 = makeClass({
 });
 const UInt64 = makeClass({
   extends: UInt,
-  static: {width: 8}
+  static: {width: 8},
+  UInt64(bytes) {
+    this._bytes = bytes;
+  },
+  toJSON() {
+    return bytesToHex(this._bytes);
+  },
+  toBN() {
+    return new BN(this._bytes);
+  }
 });
 
 module.exports = {

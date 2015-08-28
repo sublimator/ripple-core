@@ -23,7 +23,7 @@ const BinaryParser = makeClass({
     return slice(this._buf, start, end, to);
   },
   readUIntN(n) {
-    return this.read(n, Array).reduce((a, b) => (a << 8 | b) >>> 0);
+    return this.read(n, Array).reduce((a, b) => a << 8 | b) >>> 0;
   },
   readUInt8() {
     return this._buf[this._cursor++];
@@ -36,6 +36,9 @@ const BinaryParser = makeClass({
   },
   pos() {
     return this._cursor;
+  },
+  size() {
+    return this._buf.length;
   },
   end(customEnd) {
     const cursor = this.pos();
@@ -63,21 +66,22 @@ const BinaryParser = makeClass({
     const tagByte = this.readUInt8();
     const type = (tagByte & 0xF0) >>> 4 || this.readUInt8();
     const nth = tagByte & 0x0F || this.readUInt8();
-    return (type << 16) | nth;
+    return type << 16 | nth;
   },
   readField() {
     return fields.byOrdinal[this.readFieldOrdinal()];
   },
   readType(type) {
-    return typeof type === 'string' ? this._parsers[type].fromParser(this) :
-                                      type.fromParser(this);
+    return type.fromParser(this);
+  },
+  parserForField(field) {
+    return this._parsers[field] || this._parsers[field.type];
   },
   readFieldValue(field) {
-    const kls = this._parsers[field] || this._parsers[field.type];
+    const kls = this.parserForField(field);
     if (!kls) {
       throw new Error(`unsupported: (${field.name}, ${field.type.name})`);
     }
-
     const sizeHint = field.isVLEncoded ? this.readVLLength() : null;
     const value = kls.fromParser(this, sizeHint);
     if (value === undefined) {
