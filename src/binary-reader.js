@@ -5,7 +5,7 @@
 const _ = require('lodash');
 const {BinaryParser} = require('./binary-parser');
 const {Enums} = require('./binary-definitions');
-const types = require('./types-index');
+const types = require('./types');
 
 function buildEnumType(k, bytes) {
   const enumMap = Enums[k];

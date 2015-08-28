@@ -1,8 +1,8 @@
 'use strict';
 
 const _ = require('lodash');
-const makeClass = require('./extend-class');
-const {Fields} = require('./binary-definitions');
+const makeClass = require('../make-class');
+const {Fields} = require('../binary-definitions');
 const {ObjectEndMarker} = Fields;
 
 const STObject = makeClass({

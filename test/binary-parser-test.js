@@ -314,20 +314,20 @@ function parseLedger4320278() {
       try {
         assert.deepEqual(actual, expected);
       } catch(error) {
-        console.log('error', i, error);
+        console.log('error', i, /* !ripple && */ error);
       }
     });
   });
 }
 
-function dataDrivenTests() {
-  unused('as-ledger-4320278.json', parseLedger4320278);
-  describe('Amount parsing tests', amountParsingTests);
-  describe('Field Tests', fieldParsingTests);
-  describe('Parsing nested objects', nestedObjectTests);
-}
-
 describe('BinaryParser', function() {
+  function dataDrivenTests() {
+    unused('as-ledger-4320278.json', parseLedger4320278);
+    describe('Amount parsing tests', amountParsingTests);
+    describe('Field Tests', fieldParsingTests);
+    describe('Parsing nested objects', nestedObjectTests);
+  }
+
   describe('pathSetBinaryTests', pathSetBinaryTests);
   describe('Basic API', basicApiTests);
   describe('Parsing a transaction', transactionParsingTests);

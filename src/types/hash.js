@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require('assert');
-const makeClass = require('./extend-class');
-const {compareBytes, parseBytes, bytesToHex} = require('./bytes-utils');
+const makeClass = require('../make-class');
+const {compareBytes, parseBytes, bytesToHex} = require('../bytes-utils');
 
 const Hash = makeClass({
   Hash(bytes) {

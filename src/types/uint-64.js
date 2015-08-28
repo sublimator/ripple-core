@@ -1,8 +1,8 @@
 'use strict';
 
 const BN = require('bn.js');
-const makeClass = require('./extend-class');
-const {bytesToHex} = require('./bytes-utils');
+const makeClass = require('../make-class');
+const {bytesToHex} = require('../bytes-utils');
 const {UInt} = require('./uint');
 
 const UInt64 = makeClass({

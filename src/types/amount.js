@@ -1,8 +1,8 @@
 'use strict';
 
 const Decimal = require('decimal.js');
-const makeClass = require('./extend-class');
-const {bytesToHex} = require('./bytes-utils');
+const makeClass = require('../make-class');
+const {bytesToHex} = require('../bytes-utils');
 const {Currency} = require('./currency');
 const {AccountID} = require('./account-id');
 

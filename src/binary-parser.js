@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const makeClass = require('./extend-class');
+const makeClass = require('./make-class');
 const {Fields} = require('./binary-definitions');
 const {slice, parseBytes} = require('./bytes-utils');
 

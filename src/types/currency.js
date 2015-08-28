@@ -1,9 +1,10 @@
 'use strict';
 
 const _ = require('lodash');
-const makeClass = require('./extend-class');
-const {slice} = require('./bytes-utils');
+const makeClass = require('../make-class');
+const {slice} = require('../bytes-utils');
 const {Hash160} = require('./hash');
+const ISO_REGEX = /[A-Z0-9]{3}/;
 
 const $uper = Hash160.prototype;
 const Currency = makeClass({
@@ -28,7 +29,7 @@ const Currency = makeClass({
         break;
       }
     }
-    const lossLessISO = onlyISO && iso !== 'XRP' && iso.match(/[A-Z]{3}/);
+    const lossLessISO = onlyISO && iso !== 'XRP' && iso.match(ISO_REGEX);
     this._isNative = onlyISO && _.isEqual(code, [0, 0, 0]);
     this._iso = this._isNative ? 'XRP' : lossLessISO ? iso : null;
   },

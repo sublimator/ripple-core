@@ -16,6 +16,11 @@ describe('bytes-utils', function() {
       assert(result instanceof Uint8Array);
       assert.deepEqual(result, [0x00, 0x12]);
     });
+    it('can convert a list to a Uint8Array', function() {
+      const result = parseBytes([0x00, 0x12], Uint8Array);
+      assert(result instanceof Uint8Array);
+      assert.deepEqual(result, [0x00, 0x12]);
+    });
     it('can decode hex to a Buffer', function() {
       const result = parseBytes('012', Buffer);
       assert(result instanceof Buffer);

@@ -1,7 +1,7 @@
 'use strict';
 
-const makeClass = require('./extend-class');
-const {parseBytes, bytesToHex} = require('./bytes-utils');
+const makeClass = require('../make-class');
+const {parseBytes, bytesToHex} = require('../bytes-utils');
 
 const Blob = makeClass({
   Blob(bytes) {

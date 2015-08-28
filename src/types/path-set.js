@@ -1,7 +1,7 @@
 'use strict';
 /* eslint-disable no-unused-expressions */
 
-const makeClass = require('./extend-class');
+const makeClass = require('../make-class');
 const {Currency} = require('./currency');
 const {AccountID} = require('./account-id');
 

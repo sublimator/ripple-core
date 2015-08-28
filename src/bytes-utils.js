@@ -47,6 +47,8 @@ function parseBytes(val, Output = Array) {
     return res;
   } else if (val instanceof Output) {
     return val;
+  } else if (Output === Uint8Array) {
+    return new Output(val);
   }
   const res = new Output(val.length);
   for (let i = val.length - 1; i >= 0; i--) {
