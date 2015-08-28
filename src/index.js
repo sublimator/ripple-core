@@ -1,6 +1,6 @@
 'use strict';
 
-const {fields} = require('./binary-definitions');
+const {Fields, Enums} = require('./binary-definitions');
 const {Hash, Hash160, Hash128, Hash256} = require('./hash');
 const {AccountID} = require('./account-id');
 const {Currency} = require('./currency');
@@ -13,11 +13,13 @@ const {STArray} = require('./st-array');
 const {Vector256} = require('./vector-256');
 
 module.exports = {
+  Fields,
+  Enums,
+
   AccountID,
   Amount,
   Blob,
   Currency,
-  fields,
   Hash,
   Hash128,
   Hash160,

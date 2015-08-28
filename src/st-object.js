@@ -2,8 +2,8 @@
 
 const _ = require('lodash');
 const makeClass = require('./extend-class');
-const {fields} = require('./binary-definitions');
-const {ObjectEndMarker} = fields;
+const {Fields} = require('./binary-definitions');
+const {ObjectEndMarker} = Fields;
 
 const STObject = makeClass({
   static: {

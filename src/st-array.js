@@ -1,9 +1,9 @@
 'use strict';
 
 const makeClass = require('./extend-class');
-const {fields} = require('./binary-definitions');
+const {Fields} = require('./binary-definitions');
 const {STObject} = require('./st-object');
-const {ArrayEndMarker} = fields;
+const {ArrayEndMarker} = Fields;
 
 const STArray = makeClass({
   extends: Array,

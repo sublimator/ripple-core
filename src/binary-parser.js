@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const makeClass = require('./extend-class');
-const {fields} = require('./binary-definitions');
+const {Fields} = require('./binary-definitions');
 const {slice, parseBytes} = require('./bytes-utils');
 
 const BinaryParser = makeClass({
@@ -69,7 +69,7 @@ const BinaryParser = makeClass({
     return type << 16 | nth;
   },
   readField() {
-    return fields.byOrdinal[this.readFieldOrdinal()];
+    return Fields[this.readFieldOrdinal()];
   },
   readType(type) {
     return type.fromParser(this);
