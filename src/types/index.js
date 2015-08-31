@@ -1,5 +1,8 @@
 'use strict';
 
+const _ = require('lodash');
+
+const {Type, Field, Enums} = require('../enums');
 const {AccountID} = require('./account-id');
 const {Amount} = require('./amount');
 const {Blob} = require('./blob');
@@ -16,7 +19,7 @@ const {UInt64} = require('./uint-64');
 const {UInt8} = require('./uint-8');
 const {Vector256} = require('./vector-256');
 
-module.exports = {
+const coreTypes = {
   AccountID,
   Amount,
   Blob,
@@ -33,3 +36,23 @@ module.exports = {
   UInt64,
   Vector256
 };
+
+const UNKNOWN_TYPES = [
+  Type.Unknown,
+  Type.Transaction,
+  Type.Validation,
+  Type.LedgerEntry
+];
+
+_.sortBy(Field.values, 'id').forEach((field) => {
+  if (!_.includes(UNKNOWN_TYPES, field.type)) {
+    const Enum = Enums[field];
+    const ret = Enum ? Enum : coreTypes[field.type.name];
+    if (ret === undefined) {
+      throw new Error(`cant find type for ${field.name}`);
+    }
+    field.associatedType = ret;
+  }
+});
+
+module.exports = coreTypes;

@@ -8,13 +8,16 @@ const Blob = makeClass({
     this._bytes = parseBytes(bytes, Uint8Array);
   },
   toBytesSink(sink) {
-    sink.add(this._bytes);
+    sink.put(this._bytes);
   },
   static: {
     fromParser(parser, hint) {
       return new this(parser.read(hint));
     },
     from(value) {
+      if (value instanceof this) {
+        return value;
+      }
       return new this(parseBytes(value));
     }
   },

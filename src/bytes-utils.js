@@ -57,6 +57,15 @@ function parseBytes(val, Output = Array) {
   return res;
 }
 
+function serializeUIntN(val, width) {
+  const newBytes = new Uint8Array(width);
+  const lastIx = width - 1;
+  for (let i = 0; i < width; i++) {
+    newBytes[lastIx - i] = (val >>> (i * 8) & 0xff);
+  }
+  return newBytes;
+}
+
 function compareBytes(a, b) {
   assert(a.length === b.length);
   for (let i = 0; i < a.length; i++) {
@@ -89,5 +98,6 @@ module.exports = {
   parseBytes,
   bytesToHex,
   slice,
-  compareBytes
+  compareBytes,
+  serializeUIntN
 };

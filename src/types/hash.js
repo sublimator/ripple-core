@@ -6,13 +6,15 @@ const {compareBytes, parseBytes, bytesToHex} = require('../bytes-utils');
 
 const Hash = makeClass({
   Hash(bytes) {
-    this._bytes = parseBytes(bytes, Uint8Array);
-    assert.equal(this._bytes.length, this.constructor.width);
+    const width = this.constructor.width;
+    this._bytes = bytes ? parseBytes(bytes, Uint8Array) :
+                          new Uint8Array(width);
+    assert.equal(this._bytes.length, width);
   },
   static: {
     width: NaN,
     from(value) {
-      if (value instanceof this.constructor) {
+      if (value instanceof this) {
         return value;
       }
       return new this(parseBytes(value));
@@ -22,7 +24,8 @@ const Hash = makeClass({
     }
   },
   compareTo(other) {
-    return compareBytes(this._bytes, other._bytes);
+    return compareBytes(this._bytes,
+                        this.constructor.from(other)._bytes);
   },
   lessThan(other) {
     return this.compareTo(other) === -1;
@@ -34,29 +37,13 @@ const Hash = makeClass({
     return this.compareTo(other) === 1;
   },
   toBytesSink(sink) {
-    sink.add(this._bytes);
+    sink.put(this._bytes);
   },
   toJSON() {
     return bytesToHex(this._bytes);
   }
 });
 
-const Hash128 = makeClass({
-  extends: Hash,
-  static: {width: 16}
-});
-const Hash160 = makeClass({
-  extends: Hash,
-  static: {width: 20}
-});
-const Hash256 = makeClass({
-  extends: Hash,
-  static: {width: 32}
-});
-
 module.exports = {
-  Hash,
-  Hash128,
-  Hash160,
-  Hash256
+  Hash
 };

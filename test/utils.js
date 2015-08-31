@@ -2,7 +2,6 @@
 
 const assert = require('assert');
 const Decimal = require('decimal.js');
-const fs = require('fs');
 const {parseBytes} = require('../src/bytes-utils');
 
 function hexOnly(hex) {
@@ -15,7 +14,7 @@ function parseHexOnly(hex, to) {
 
 function loadFixture(relativePath) {
   const fn = __dirname + '/fixtures/' + relativePath;
-  return JSON.parse(fs.readFileSync(fn).toString());
+  return require(fn);
 }
 
 function assertEqualAmountJSON(actual, expected) {

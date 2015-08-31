@@ -8,7 +8,8 @@ const _ = require('lodash');
 const assert = require('assert-diff');
 const {encodeAccountID} = require('ripple-address-codec');
 
-const {binary: {makeParser, readJSON}, Fields, Amount, Hash160} = coreTypes;
+const {binary: {makeParser, readJSON}, Field, Amount, Hash160} = coreTypes;
+const {Enums: {TransactionType}} = coreTypes;
 const utils = require('./utils');
 const {parseHexOnly, assertEqualAmountJSON, hexOnly, loadFixture} = utils;
 const {bytesToHex} = require('../src/bytes-utils');
@@ -75,29 +76,29 @@ function transactionParsingTests() {
   it('can be done with low level apis', () => {
     const parser = makeParser(transaction.binary);
 
-    assert.equal(parser.readField(), Fields.TransactionType);
+    assert.equal(parser.readField(), Field.TransactionType);
     assert.equal(parser.readUInt16(), 7);
-    assert.equal(parser.readField(), Fields.Flags);
+    assert.equal(parser.readField(), Field.Flags);
     assert.equal(parser.readUInt32(), 0);
-    assert.equal(parser.readField(), Fields.Sequence);
+    assert.equal(parser.readField(), Field.Sequence);
     assert.equal(parser.readUInt32(), 103929);
-    assert.equal(parser.readField(), Fields.TakerPays);
+    assert.equal(parser.readField(), Field.TakerPays);
     parser.read(8);
-    assert.equal(parser.readField(), Fields.TakerGets);
+    assert.equal(parser.readField(), Field.TakerGets);
     // amount value
     assert(parser.read(8));
     // amount currency
     assert(Hash160.fromParser(parser));
     assert.equal(encodeAccountID(parser.read(20)),
                  tx_json.TakerGets.issuer);
-    assert.equal(parser.readField(), Fields.Fee);
+    assert.equal(parser.readField(), Field.Fee);
     assert(parser.read(8));
-    assert.equal(parser.readField(), Fields.SigningPubKey);
+    assert.equal(parser.readField(), Field.SigningPubKey);
     assert.equal(parser.readVLLength(), 33);
     assert.equal(bytesToHex(parser.read(33)), tx_json.SigningPubKey);
-    assert.equal(parser.readField(), Fields.TxnSignature);
+    assert.equal(parser.readField(), Field.TxnSignature);
     assert.equal(bytesToHex(parser.readVL()), tx_json.TxnSignature);
-    assert.equal(parser.readField(), Fields.Account);
+    assert.equal(parser.readField(), Field.Account);
     assert.equal(encodeAccountID(parser.readVL()), tx_json.Account);
     assert(parser.end());
   });
@@ -107,39 +108,51 @@ function transactionParsingTests() {
     function readField() {
       return parser.readFieldAndValue();
     }
-    assert.deepEqual(readField(), [Fields.TransactionType, 'OfferCreate']);
-    assert.deepEqual(readField(), [Fields.Flags, 0]);
-    assert.deepEqual(readField(), [Fields.Sequence, 103929]);
     {
       const [field, value] = readField();
-      assert.equal(field, Fields.TakerPays);
+      assert.equal(field, Field.TransactionType);
+      assert.equal(value, TransactionType.OfferCreate);
+    }
+    {
+      const [field, value] = readField();
+      assert.equal(field, Field.Flags);
+      assert.equal(value, 0);
+    }
+    {
+      const [field, value] = readField();
+      assert.equal(field, Field.Sequence);
+      assert.equal(value, 103929);
+    }
+    {
+      const [field, value] = readField();
+      assert.equal(field, Field.TakerPays);
       assert.equal(value.currency.isNative(), true);
       assert.equal(value.currency.toJSON(), 'XRP');
     }
     {
       const [field, value] = readField();
-      assert.equal(field, Fields.TakerGets);
+      assert.equal(field, Field.TakerGets);
       assert.equal(value.currency.isNative(), false);
       assert.equal(value.issuer.toJSON(), tx_json.TakerGets.issuer);
     }
     {
       const [field, value] = readField();
-      assert.equal(field, Fields.Fee);
+      assert.equal(field, Field.Fee);
       assert.equal(value.currency.isNative(), true);
     }
     {
       const [field, value] = readField();
-      assert.equal(field, Fields.SigningPubKey);
+      assert.equal(field, Field.SigningPubKey);
       assert.equal(value.toJSON(), tx_json.SigningPubKey);
     }
     {
       const [field, value] = readField();
-      assert.equal(field, Fields.TxnSignature);
+      assert.equal(field, Field.TxnSignature);
       assert.equal(value.toJSON(), tx_json.TxnSignature);
     }
     {
       const [field, value] = readField();
-      assert.equal(field, Fields.Account);
+      assert.equal(field, Field.Account);
       assert.equal(value.toJSON(), tx_json.Account);
     }
     assert(parser.end());
@@ -152,27 +165,30 @@ function transactionParsingTests() {
 }
 
 function amountParsingTests() {
-  _.filter(fixtures.values_tests, {type: 'Amount'}).forEach((f) => {
+  _.filter(fixtures.values_tests, {type: 'Amount'}).forEach((f, i) => {
     if (f.error) {
       return;
     }
     const parser = makeParser(f.expected_hex);
     const testName =
-      `parses ${f.expected_hex.slice(0, 16)}...
+      `values_tests[${i}] parses ${f.expected_hex.slice(0, 16)}...
           as ${JSON.stringify(f.test_json)}`;
     it(testName, () => {
       const value = parser.readType(Amount);
       // May not actually be in canonical form. The fixtures are to be used
       // also for json -> binary;
       assertEqualAmountJSON(toJSON(value), f.test_json);
+      if (f.exponent) {
+        assert.equal(value.exponent(), f.exponent);
+      }
     });
   });
 }
 
 function fieldParsingTests() {
-  fixtures.fields_tests.forEach((f) => {
+  fixtures.fields_tests.forEach((f, i) => {
     const parser = makeParser(f.expected_hex);
-    it(`parses ${f.expected_hex} as ${f.name}`, () => {
+    it(`fields[${i}]: parses ${f.expected_hex} as ${f.name}`, () => {
       const field = parser.readField();
       assert.equal(field.name, f.name);
       assert.equal(field.type.name, f.type_name);
@@ -190,20 +206,18 @@ function nestedObjectTests() {
     if (disabled(i)) {
       return;
     }
-    const parser = makeParser(f.blob_with_no_signing);
-    it(`can parse whole_objects[${i}] blob into
+
+    it(`whole_objects[${i}]: can parse blob into
           ${JSON.stringify(f.tx_json)}`,
     /*                                              */ () => {
 
+      const parser = makeParser(f.blob_with_no_signing);
       let ix = 0;
       while (!parser.end()) {
         const [field, value] = parser.readFieldAndValue();
-        if (value === null) {
-          continue;
-        }
-
-        const expectedJSON = f.fields[ix][1].json;
-        const expectedField = f.fields[ix][0];
+        const expected = f.fields[ix];
+        const expectedJSON = expected[1].json;
+        const expectedField = expected[0];
         const actual = toJSON(value);
 
         try {
@@ -302,10 +316,14 @@ function pathSetBinaryTests() {
 }
 
 function parseLedger4320278() {
-  // const ripple = require('ripple-lib')._DEPRECATED;
-  // ripple.Amount.strict_mode = false;
-  const json = loadFixture('as-ledger-4320278.json');
+  let ripple = require('ripple-lib');
+  if (ripple._DEPRECATED) {
+    ripple = ripple._DEPRECATED;
+  }
+  ripple.Amount.strict_mode = false;
+
   it(`can parse object`, () => {
+    const json = loadFixture('as-ledger-4320278.json');
     this.timeout(0);
 
     json.forEach((e, i) => {
@@ -316,7 +334,7 @@ function parseLedger4320278() {
       try {
         assert.deepEqual(actual, expected);
       } catch(error) {
-        console.log('error', i, /* !ripple && */ error);
+        console.log('error', i, !ripple && error);
       }
     });
   });
@@ -324,12 +342,11 @@ function parseLedger4320278() {
 
 describe('BinaryParser', function() {
   function dataDrivenTests() {
-    unused('as-ledger-4320278.json', parseLedger4320278);
+    describe.skip('as-ledger-4320278.json', parseLedger4320278);
     describe('Amount parsing tests', amountParsingTests);
     describe('Field Tests', fieldParsingTests);
     describe('Parsing nested objects', nestedObjectTests);
   }
-
   describe('pathSetBinaryTests', pathSetBinaryTests);
   describe('Basic API', basicApiTests);
   describe('Parsing a transaction', transactionParsingTests);

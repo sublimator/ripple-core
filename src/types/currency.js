@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const makeClass = require('../make-class');
 const {slice} = require('../bytes-utils');
-const {Hash160} = require('./hash');
+const {Hash160} = require('./hash-160');
 const ISO_REGEX = /[A-Z0-9]{3}/;
 
 const $uper = Hash160.prototype;

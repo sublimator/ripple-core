@@ -1,16 +1,18 @@
+/* eslint-disable func-style */
+
 'use strict';
 
 const assert = require('assert');
 const makeClass = require('./make-class');
-const {Fields} = require('./binary-definitions');
+const {Field} = require('./enums');
+const types = require('./types');
 const {slice, parseBytes} = require('./bytes-utils');
 
 const BinaryParser = makeClass({
-  BinaryParser(buf, parsers = {}) {
+  BinaryParser(buf) {
     this._buf = parseBytes(buf, Uint8Array);
     this._length = this._buf.length;
     this._cursor = 0;
-    this._parsers = parsers;
   },
   skip(n) {
     this._cursor += n;
@@ -69,16 +71,16 @@ const BinaryParser = makeClass({
     return type << 16 | nth;
   },
   readField() {
-    return Fields[this.readFieldOrdinal()];
+    return Field[this.readFieldOrdinal()];
   },
   readType(type) {
     return type.fromParser(this);
   },
-  parserForField(field) {
-    return this._parsers[field] || this._parsers[field.type];
+  typeForField(field) {
+    return field.associatedType;
   },
   readFieldValue(field) {
-    const kls = this.parserForField(field);
+    const kls = this.typeForField(field);
     if (!kls) {
       throw new Error(`unsupported: (${field.name}, ${field.type.name})`);
     }
@@ -96,6 +98,11 @@ const BinaryParser = makeClass({
   }
 });
 
+const makeParser = bytes => new BinaryParser(bytes);
+const readJSON = parser => parser.readType(types.STObject).toJSON();
+
 module.exports = {
-  BinaryParser
+  BinaryParser,
+  makeParser,
+  readJSON
 };

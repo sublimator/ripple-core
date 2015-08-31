@@ -56,7 +56,10 @@ module.exports = function makeClass(klass_, definition_) {
       addFunc(f);
     }
   });
-  _.merge(klass, definition.static);
+  _.assign(klass, definition.static);
+  if (klass.init) {
+    klass.init();
+  }
   forEach(definition.cached, f => {
     const key = '_' + f.name;
     addFunc(f, function() {

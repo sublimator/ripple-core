@@ -1,9 +1,9 @@
 'use strict';
 
 const makeClass = require('../make-class');
-const {Fields} = require('../binary-definitions');
+const {Field} = require('../enums');
 const {STObject} = require('./st-object');
-const {ArrayEndMarker} = Fields;
+const {ArrayEndMarker} = Field;
 
 const STArray = makeClass({
   extends: Array,
@@ -20,10 +20,19 @@ const STArray = makeClass({
         array.push(outer);
       }
       return array;
+    },
+    from(value) {
+      if (value instanceof this) {
+        return value;
+      }
+      throw new Error('unimplemented');
     }
   },
   toJSON() {
     return this.map((v) => v.toJSON());
+  },
+  toBytesSink(sink) {
+    this.forEach(so => so.toBytesSink(sink));
   }
 });
 

@@ -48,6 +48,12 @@ const Path = makeClass({
 const PathSet = makeClass({
   extends: Array,
   static: {
+    from(value) {
+      if (value instanceof this) {
+        return value;
+      }
+      throw new Error('unimplemented');
+    },
     fromParser(parser) {
       const pathSet = new PathSet();
       let path;
@@ -61,7 +67,8 @@ const PathSet = makeClass({
           continue;
         }
         if (!path) {
-          pathSet.push(path = new Path());
+          path = new Path();
+          pathSet.push(path);
         }
         path.push(Hop.parse(parser, type));
       }
@@ -70,6 +77,24 @@ const PathSet = makeClass({
   },
   toJSON() {
     return this.map(k => k.toJSON());
+  },
+  toBytesSink(sink) {
+    let n = 0;
+    this.forEach((path) => {
+      if (n++ !== 0) {
+        sink.put([PATH_SEPARATOR_BYTE]);
+      }
+      path.forEach((hop) => {
+        const type = hop.type();
+        sink.put([type]);
+        ['account', 'currency', 'issuer'].forEach(k => {
+          if (hop[k]) {
+            hop[k].toBytesSink(sink);
+          }
+        });
+      });
+    });
+    sink.put([PATHSET_END_BYTE]);
   }
 });
 

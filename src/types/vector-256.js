@@ -1,7 +1,7 @@
 'use strict';
 
 const makeClass = require('../make-class');
-const {Hash256} = require('./hash');
+const {Hash256} = require('./hash-256');
 
 const Vector256 = makeClass({
   extends: Array,
@@ -14,7 +14,16 @@ const Vector256 = makeClass({
         vector256.push(Hash256.fromParser(parser));
       }
       return vector256;
+    },
+    from(value) {
+      if (value instanceof this) {
+        return value;
+      }
+      throw new Error('unimplemented');
     }
+  },
+  toBytesSink(sink) {
+    this.forEach(h => h.toBytesSink(sink));
   },
   toJSON() {
     return this.map((hash) => hash.toJSON());

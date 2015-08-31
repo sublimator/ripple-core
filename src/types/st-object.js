@@ -2,14 +2,15 @@
 
 const _ = require('lodash');
 const makeClass = require('../make-class');
-const {Fields} = require('../binary-definitions');
-const {ObjectEndMarker} = Fields;
+const {Field} = require('../enums');
+const {BinarySerializer} = require('../binary-serializer');
+const {ObjectEndMarker} = Field;
 
 const STObject = makeClass({
   static: {
     fromParser(parser, hint_) {
       const hint = typeof hint_ === 'number' ?
-                     parser.pos() + hint_ : null;
+                    parser.pos() + hint_ : null;
       const so = new STObject();
       while (!parser.end(hint)) {
         const field = parser.readField();
@@ -19,11 +20,26 @@ const STObject = makeClass({
         so[field] = parser.readFieldValue(field);
       }
       return so;
+    },
+    from(value) {
+      if (value instanceof this) {
+        return value;
+      }
+      throw new Error('unimplemented');
     }
   },
   toJSON() {
     return _.transform(this, (result, value, key) => {
       result[key] = value.toJSON ? value.toJSON() : value;
+    });
+  },
+  toBytesSink(sink) {
+    const serializer = new BinarySerializer(sink);
+    const fields = Object.keys(this).map((k) => Field[k]).filter(Boolean);
+    const sorted = _.sortBy(fields, 'ordinal');
+    sorted.forEach((field) => {
+      const value = this[field];
+      serializer.writeFieldAndValue(field, value);
     });
   }
 });

@@ -1,12 +1,12 @@
 'use strict';
-const _ = require('lodash');
 
-const {Fields, Enums} = require('./binary-definitions');
+const _ = require('lodash');
+const {Field, Enums} = require('./enums');
 const types = require('./types');
-const binaryReader = require('./binary-reader');
+const binaryReader = require('./binary-parser');
 
 module.exports = _.assign(
-  {Fields,
+  {Field,
    Enums,
    binary: binaryReader},
   types

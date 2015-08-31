@@ -2,7 +2,7 @@
 
 const makeClass = require('../make-class');
 const {decodeAccountID, encodeAccountID} = require('ripple-address-codec');
-const {Hash160} = require('./hash');
+const {Hash160} = require('./hash-160');
 
 const AccountID = makeClass({
   AccountID(bytes) {
@@ -14,14 +14,14 @@ const AccountID = makeClass({
       if (typeof value === 'string' && value[0] === 'r') {
         return new this(decodeAccountID(value));
       }
-      return value;
+      if (value instanceof this) {
+        return value;
+      }
+      throw new Error('unimplemented');
     }
   },
   toJSON() {
     return encodeAccountID(this._bytes);
-  },
-  toSink(sink) {
-    sink.addBytes(this._bytes);
   }
 });
 
