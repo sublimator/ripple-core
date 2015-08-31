@@ -13,11 +13,6 @@ const BytesSink = {
 
 const BytesList = makeClass({
   implements: BytesSink,
-  static: {
-    put(bytes) {
-      return new BytesList().put(bytes);
-    }
-  },
   BytesList() {
     this.arrays = [];
     this.length = 0;
@@ -87,7 +82,6 @@ const BinarySerializer = makeClass({
     const sink = this.sink;
     const value = field.associatedType.from(_value);
     assert(value.toBytesSink, field);
-
     sink.put(field.bytes);
 
     if (field.isVLEncoded) {

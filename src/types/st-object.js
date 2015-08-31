@@ -8,11 +8,10 @@ const {ObjectEndMarker} = Field;
 
 const STObject = makeClass({
   static: {
-    fromParser(parser, hint_) {
-      const hint = typeof hint_ === 'number' ?
-                    parser.pos() + hint_ : null;
-      const so = new STObject();
-      while (!parser.end(hint)) {
+    fromParser(parser, hint) {
+      const end = typeof hint === 'number' ? parser.pos() + hint : null;
+      const so = new this();
+      while (!parser.end(end)) {
         const field = parser.readField();
         if (field === ObjectEndMarker) {
           break;
@@ -25,8 +24,21 @@ const STObject = makeClass({
       if (value instanceof this) {
         return value;
       }
+      if (typeof value === 'object') {
+        return _.transform(value, (so, val, key) => {
+          const field = Field[key];
+          if (field) {
+            so[field] = field.associatedType.from(val);
+          } else {
+            so[key] = val;
+          }
+        }, new this());
+      }
       throw new Error('unimplemented');
     }
+  },
+  fieldKeys() {
+    return Object.keys(this).map((k) => Field[k]).filter(Boolean);
   },
   toJSON() {
     return _.transform(this, (result, value, key) => {
@@ -35,7 +47,7 @@ const STObject = makeClass({
   },
   toBytesSink(sink) {
     const serializer = new BinarySerializer(sink);
-    const fields = Object.keys(this).map((k) => Field[k]).filter(Boolean);
+    const fields = this.fieldKeys();
     const sorted = _.sortBy(fields, 'ordinal');
     sorted.forEach((field) => {
       const value = this[field];

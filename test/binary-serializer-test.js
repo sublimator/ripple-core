@@ -12,7 +12,7 @@ const {loadFixture} = require('./utils');
 const fixtures = loadFixture('data-driven-tests.json');
 
 function bytesListTest() {
-  const list = BytesList.put([0]).put([2, 3]).put([4, 5]);
+  const list = new BytesList().put([0]).put([2, 3]).put([4, 5]);
   it('is an Array<Uint8Array>', function() {
     assert(Array.isArray(list.arrays));
     assert(list.arrays[0] instanceof Uint8Array);

@@ -4,7 +4,23 @@ const _ = require('lodash');
 const makeClass = require('../make-class');
 const {slice} = require('../bytes-utils');
 const {Hash160} = require('./hash-160');
-const ISO_REGEX = /[A-Z0-9]{3}/;
+const ISO_REGEX = /^[A-Z0-9]{3}$/;
+const HEX_REGEX = /^[A-F0-9]{40}$/;
+
+function isoToBytes(iso) {
+  const bytes = new Uint8Array(20);
+  const isoBytes = iso.split('').map(c => c.charCodeAt(0));
+  bytes.set(isoBytes, 12);
+  return bytes;
+}
+
+function isISOCode(val) {
+  return _.isString(val) && val.length === 3 && val.match(ISO_REGEX);
+}
+
+function isHex(val) {
+  return _.isString(val) && val.match(HEX_REGEX);
+}
 
 const $uper = Hash160.prototype;
 const Currency = makeClass({
@@ -13,6 +29,20 @@ const Currency = makeClass({
   Currency(bytes) {
     Hash160.call(this, bytes);
     this.classify();
+  },
+  static: {
+    from(val) {
+      if (val instanceof this) {
+        return val;
+      }
+      const bytes = isISOCode(val) ? isoToBytes(val) :
+                    isHex(val) ? val :
+                    null;
+      if (bytes) {
+        return new this(bytes);
+      }
+      throw new Error(`value ${val} unsupported`);
+    }
   },
   classify() {
     // We only have a non null iso() property available if the currency can be
@@ -42,7 +72,6 @@ const Currency = makeClass({
 });
 
 Currency.XRP = new Currency(new Uint8Array(20));
-
 module.exports = {
   Currency
 };

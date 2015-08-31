@@ -1,5 +1,7 @@
 'use strict';
 
+const _ = require('lodash');
+const assert = require('assert');
 const BN = require('bn.js');
 const Decimal = require('decimal.js');
 const makeClass = require('../make-class');
@@ -13,6 +15,23 @@ Decimal.config({
   toExpNeg: -32
 });
 
+function isDefined(val) {
+  return !_.isUndefined(val);
+}
+
+const parsers = {
+  string(str) {
+    return [new Decimal(str).dividedBy('1e6'), Currency.XRP];
+  },
+  object(object) {
+    assert(isDefined(object.currency), 'currency must be defined');
+    assert(isDefined(object.issuer), 'issuer must be defined');
+    return [new Decimal(object.value),
+            Currency.from(object.currency),
+            AccountID.from(object.issuer)];
+  }
+};
+
 const Amount = makeClass({
   Amount(value, currency, issuer) {
     this.value = value || new Decimal('0');
@@ -23,6 +42,10 @@ const Amount = makeClass({
     from(value) {
       if (value instanceof this) {
         return value;
+      }
+      const parser = parsers[typeof value];
+      if (parser) {
+        return new this(...parser(value));
       }
       throw new Error('unimplemented');
     },
@@ -66,6 +89,10 @@ const Amount = makeClass({
   exponent() {
     return this.isNative() ? -6 : this.value.e - 15;
   },
+  valueString() {
+    return (this.isNative() ? this.value.times('1e6') : this.value)
+            .toString();
+  },
   toBytesSink(sink) {
     const isNative = this.isNative();
     const notNegative = !this.value.isNegative();
@@ -91,11 +118,12 @@ const Amount = makeClass({
     }
   },
   toJSON() {
+    const valueString = this.valueString();
     if (this.isNative()) {
-      return this.value.times('1e6').toString();
+      return valueString;
     }
     return {
-      value: this.value.toString(),
+      value: valueString,
       currency: this.currency.toJSON(),
       issuer: this.issuer.toJSON()
     };

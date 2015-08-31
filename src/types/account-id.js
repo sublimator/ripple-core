@@ -11,17 +11,15 @@ const AccountID = makeClass({
   extends: Hash160,
   static: {
     from(value) {
-      if (typeof value === 'string' && value[0] === 'r') {
-        return new this(decodeAccountID(value));
-      }
-      if (value instanceof this) {
-        return value;
-      }
-      throw new Error('unimplemented');
+      return value instanceof this ? value :
+              new this(/^r/.test(value) ? decodeAccountID(value) :
+                        value);
     }
   },
-  toJSON() {
-    return encodeAccountID(this._bytes);
+  cached: {
+    toJSON() {
+      return encodeAccountID(this._bytes);
+    }
   }
 });
 
