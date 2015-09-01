@@ -7,7 +7,7 @@ const assert = require('assert-diff');
 const _ = require('lodash');
 const Sequelize = require('sequelize');
 const {STObject, binary} = require('../src');
-const {BytesList, readJSON, makeParser} = binary;
+const {readJSON, serializeObject, makeParser} = binary;
 
 function rekey(obj, mapping) {
   return _.transform(mapping, (to, v, k) => {
@@ -29,9 +29,7 @@ function prettyJSON(value) {
 function assertRecyclable(json) {
   const recycled = STObject.from(json).toJSON();
   assert.deepEqual(recycled, json);
-  const sink = new BytesList();
-  STObject.from(recycled).toBytesSink(sink);
-  const recycledAgain = binaryToJSON(sink.toHex());
+  const recycledAgain = binaryToJSON(serializeObject(recycled));
   assert.deepEqual(recycledAgain, json);
   recycledAgain.inSpanner = 'works';
   assert.throws(() => assert.deepEqual(recycledAgain, json));
@@ -60,9 +58,9 @@ function makeTransactionModel(sequelize) {
     instanceMethods: {
       toJSON() {
         const tx_json = binaryToJSON(this.RawTxn);
-        const hash = this.TransID;
         const meta = binaryToJSON(this.TxnMeta);
         const ledger_index = this.LedgerSeq;
+        const hash = this.TransID;
         return {hash, meta, tx_json, ledger_index};
       }
     }
@@ -107,7 +105,6 @@ function getArgs() {
     if (argv.recycle_test) {
       txns.forEach(tx => recycleTest(tx.toJSON()));
     }
-
     console.log(prettyJSON(txns));
     // support script.js $argv > dump.json
     console.error({query, count: txns.length});

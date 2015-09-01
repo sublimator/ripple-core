@@ -27,11 +27,8 @@ module.exports = function makeClass(klass_, definition_) {
         parent.apply(this, arguments);
       };
     }
-    /* eslint-disable no-proto */
-    // TODO: fix-me!
     inherits(klass, parent);
-    klass.__proto__ = parent;
-    /* eslint-enable no-proto */
+    _.defaults(klass, parent);
   }
   if (klass === null) {
     klass = function() {};

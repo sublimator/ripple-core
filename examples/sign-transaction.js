@@ -17,10 +17,9 @@ const signingData = tx => serializeObject(tx, PREFIXES.signing);
 function signTxJson(seed, tx_json) {
   const keyPair = keyPairFromSeed(seed);
   const tx = STObject.from(tx_json);
-  const pubKey = keyPair.pubKeyHex();
 
-  tx.SigningPubKey = pubKey;
-  tx.TxnSignature = keyPair.signHex(signingData(tx));
+  tx.SigningPubKey = bytesToHex(keyPair.pubKeyCanonicalBytes());
+  tx.TxnSignature = bytesToHex(keyPair.sign(signingData(tx)));
 
   const serialized = serializeObject(tx);
   const hash = bytesToHex(sha512Half(PREFIXES.id, serialized));
@@ -48,10 +47,10 @@ const example = {
 };
 
 (function main() {
-  const {argv: {_: [seedPos, txPos]}} = yargs;
+  const {argv: {_: [seed, tx_json]}} = yargs;
   const params = {
-    seed: seedPos || example.seed,
-    tx_json: JSON.parse(txPos || example.tx_json)
+    seed: seed || example.seed,
+    tx_json: JSON.parse(tx_json || example.tx_json)
   };
   const bundle = signTxJson(params.seed, params.tx_json);
   console.log(prettyJSON(bundle));
