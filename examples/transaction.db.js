@@ -54,20 +54,19 @@ function initDB(dbPath) {
 }
 
 function makeQuery(argv) {
-  const query = {where: {}, limit: argv.limit || 200};
   const mapping = {
     hash: 'TransID',
     ledger_index: 'LedgerSeq',
     account: 'FromAcct',
     type: 'TransType'
   };
-  _.forOwn(argv, (v, k) => {
-    const to = mapping[k];
-    if (to && v !== undefined) {
-      query.where[to] = v;
+  const where = _.transform(mapping, (to, v, k) => {
+    const arg = argv[k];
+    if (arg) {
+      to[v] = arg;
     }
   });
-  return query;
+  return {where, limit: argv.limit || 200};
 }
 
 (function main() {
@@ -80,7 +79,10 @@ function makeQuery(argv) {
       .demand('db')
       .argv;
   const {Transaction} = initDB(argv.db);
-  Transaction.findAll(makeQuery(argv)).then(function(txns) {
+  const query = makeQuery(argv);
+  Transaction.findAll(query).then(function(txns) {
     console.log(prettyJSON(txns));
+    // support script.js $argv > dump.json
+    console.error({query});
   });
 }());
