@@ -8,10 +8,8 @@ const enums = require('./enum-definitions.json');
 
 function biMap(obj, valueKey) {
   return _.transform(obj, (result, value, key) => {
-    const otherKey = value[valueKey];
-    const otherValue = value;
     result[key] = value;
-    result[otherKey] = otherValue;
+    result[value[valueKey]] = value;
   });
 }
 
@@ -35,10 +33,15 @@ const EnumType = makeClass({
   static: {
     ordinalByteWidth: 1,
     fromParser(parser) {
-      return this[parser.readUIntN(this.ordinalByteWidth)];
+      return this.from(parser.readUIntN(this.ordinalByteWidth));
     },
     from(val) {
-      return val instanceof this ? val : this[val];
+      const ret = val instanceof this ? val : this[val];
+      if (!ret) {
+        throw new Error(
+          `${val} is not a valid name or ordinal for ${this.enumName}`);
+      }
+      return ret;
     },
     valuesByName() {
       return _.transform(this.initVals, (result, ordinal, name) => {
@@ -58,12 +61,16 @@ const EnumType = makeClass({
 
 const Type = makeClass({
   extends: EnumType,
-  static: {initVals: enums.TYPES}
+  static: {
+    enumName: 'Type',
+    initVals: enums.TYPES
+  }
 });
 
 const LedgerEntryType = makeClass({
   extends: EnumType,
   static: {
+    enumName: 'LedgerEntryType',
     initVals: enums.LEDGER_ENTRY_TYPES,
     ordinalByteWidth: 2
   }
@@ -72,6 +79,7 @@ const LedgerEntryType = makeClass({
 const TransactionType = makeClass({
   extends: EnumType,
   static: {
+    enumName: 'TransactionType',
     initVals: enums.TRANSACTION_TYPES,
     ordinalByteWidth: 2
   }
@@ -80,6 +88,7 @@ const TransactionType = makeClass({
 const TransactionResult = makeClass({
   extends: EnumType,
   static: {
+    enumName: 'TransactionResult',
     initVals: enums.TRANSACTION_RESULTS,
     ordinalByteWidth: 1
   }
@@ -88,6 +97,7 @@ const TransactionResult = makeClass({
 const Field = makeClass({
   extends: EnumType,
   static: {
+    enumName: 'Field',
     initVals: enums.FIELDS,
     valuesByName() {
       const fields = _.map(this.initVals, ([name, definition]) => {
@@ -102,17 +112,17 @@ const Field = makeClass({
     header(type, nth) {
       const name = nth;
       const header = [];
-      const add = header.push.bind(header);
+      const push = header.push.bind(header);
       if (type < 16) {
         if (name < 16) {
-          add(type << 4 | name);
+          push(type << 4 | name);
         } else {
-          add(type << 4, name);
+          push(type << 4, name);
         }
       } else if (name < 16) {
-        add(name, type);
+        push(name, type);
       } else {
-        add(0, type, name);
+        push(0, type, name);
       }
       return parseBytes(header, Uint8Array);
     }
@@ -128,8 +138,8 @@ const Enums = {
   TransactionResult
 };
 
-module.exports = _.assign({
+module.exports = {
   Type,
   Field,
   Enums
-}, Enums);
+};

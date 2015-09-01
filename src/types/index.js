@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 
-const {Type, Field, Enums} = require('../enums');
+const {Field, Enums} = require('../enums');
 const {AccountID} = require('./account-id');
 const {Amount} = require('./amount');
 const {Blob} = require('./blob');
@@ -37,22 +37,9 @@ const coreTypes = {
   Vector256
 };
 
-const UNKNOWN_TYPES = [
-  Type.Unknown,
-  Type.Transaction,
-  Type.Validation,
-  Type.LedgerEntry
-];
-
 _.sortBy(Field.values, 'id').forEach((field) => {
-  if (!_.includes(UNKNOWN_TYPES, field.type)) {
-    const Enum = Enums[field];
-    const ret = Enum ? Enum : coreTypes[field.type.name];
-    if (ret === undefined) {
-      throw new Error(`cant find type for ${field.name}`);
-    }
-    field.associatedType = ret;
-  }
+  // TransactionType, TransactionResult, LedgerEntryType etc
+  field.associatedType = Enums[field] || coreTypes[field.type];
 });
 
 module.exports = coreTypes;

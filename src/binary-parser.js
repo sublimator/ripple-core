@@ -71,7 +71,7 @@ const BinaryParser = makeClass({
     return type << 16 | nth;
   },
   readField() {
-    return Field[this.readFieldOrdinal()];
+    return Field.from(this.readFieldOrdinal());
   },
   readType(type) {
     return type.fromParser(this);
