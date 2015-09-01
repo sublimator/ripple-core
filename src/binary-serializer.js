@@ -87,9 +87,6 @@ const BinarySerializer = makeClass({
   },
   writeFieldAndValue(field, _value) {
     const sink = this.sink;
-    if (!field.associatedType) {
-      throw new Error(`wtf ${field}`);
-    }
     const value = field.associatedType.from(_value);
     assert(value.toBytesSink, field);
     sink.put(field.bytes);

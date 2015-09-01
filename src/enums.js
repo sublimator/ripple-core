@@ -53,7 +53,7 @@ const EnumType = makeClass({
     init() {
       const mapped = this.valuesByName();
       _.assign(this, biMap(mapped, 'ordinal'));
-      this.values = _.values(mapped).filter(v => v instanceof this);
+      this.values = _.values(mapped);
       return this;
     }
   }

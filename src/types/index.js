@@ -1,7 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
-
 const {Field, Enums} = require('../enums');
 const {AccountID} = require('./account-id');
 const {Amount} = require('./amount');
@@ -37,9 +35,12 @@ const coreTypes = {
   Vector256
 };
 
-_.sortBy(Field.values, 'id').forEach((field) => {
-  // TransactionType, TransactionResult, LedgerEntryType etc
-  field.associatedType = Enums[field] || coreTypes[field.type];
+Field.values.forEach(field => {
+  field.associatedType = coreTypes[field.type];
 });
+
+Field.TransactionType.associatedType = Enums.TransactionType;
+Field.TransactionResult.associatedType = Enums.TransactionResult;
+Field.LedgerEntryType.associatedType = Enums.LedgerEntryType;
 
 module.exports = coreTypes;
