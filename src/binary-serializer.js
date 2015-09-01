@@ -28,13 +28,20 @@ const BytesList = makeClass({
       sink.put(arr);
     });
   },
-  toBytes() {
-    const concatenated = new Uint8Array(this.length);
+  toBytes(To = Uint8Array) {
+    const concatenated = new To(this.length);
     let pointer = 0;
-    this.arrays.forEach(arr => {
-      concatenated.set(arr, pointer);
-      pointer += arr.length;
-    });
+    if (To === Uint8Array) {
+      this.arrays.forEach(arr => {
+        concatenated.set(arr, pointer);
+        pointer += arr.length;
+      });
+    } else {
+      this.arrays.forEach(arr => {
+        concatenated.splice(pointer, arr.length, ...arr);
+        pointer += arr.length;
+      });
+    }
     return concatenated;
   },
   toHex() {
@@ -80,6 +87,9 @@ const BinarySerializer = makeClass({
   },
   writeFieldAndValue(field, _value) {
     const sink = this.sink;
+    if (!field.associatedType) {
+      throw new Error(`wtf ${field}`);
+    }
     const value = field.associatedType.from(_value);
     assert(value.toBytesSink, field);
     sink.put(field.bytes);

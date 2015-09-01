@@ -35,6 +35,9 @@ function bytesToHex(sequence) {
 }
 
 function parseBytes(val, Output = Array) {
+  if (!val || !val.length) {
+    throw new Error(`${val} is not a hex string or bytes sequence`);
+  }
   if (typeof val === 'string') {
     const start = val.length % 2;
     const res = new Output((val.length + start) / 2);

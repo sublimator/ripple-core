@@ -1,11 +1,8 @@
-/* eslint-disable func-style */
-
 'use strict';
 
 const assert = require('assert');
 const makeClass = require('./make-class');
 const {Field} = require('./enums');
-const types = require('./types');
 const {slice, parseBytes} = require('./bytes-utils');
 
 const BinaryParser = makeClass({
@@ -98,11 +95,7 @@ const BinaryParser = makeClass({
   }
 });
 
-const makeParser = bytes => new BinaryParser(bytes);
-const readJSON = parser => parser.readType(types.STObject).toJSON();
 
 module.exports = {
-  BinaryParser,
-  makeParser,
-  readJSON
+  BinaryParser
 };

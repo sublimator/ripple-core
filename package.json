@@ -31,7 +31,8 @@
     "ripple-lib": "^0.12.4",
     "sequelize": "^3.6.0",
     "sqlite3": "^3.0.10",
-    "yargs": "^3.21.0"
+    "yargs": "^3.21.0",
+    "ripple-keypairs": "^0.8.0"
   },
   "scripts": {
     "compile": "babel --optional runtime -d distrib/npm/ src/",

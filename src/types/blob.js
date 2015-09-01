@@ -5,7 +5,11 @@ const {parseBytes, bytesToHex} = require('../bytes-utils');
 
 const Blob = makeClass({
   Blob(bytes) {
-    this._bytes = parseBytes(bytes, Uint8Array);
+    if (bytes) {
+      this._bytes = parseBytes(bytes, Uint8Array);
+    } else {
+      this._bytes = new Uint8Array(0);
+    }
   },
   toBytesSink(sink) {
     sink.put(this._bytes);
@@ -18,11 +22,17 @@ const Blob = makeClass({
       if (value instanceof this) {
         return value;
       }
-      return new this(parseBytes(value));
+      return new this(value);
     }
   },
   toJSON() {
+    return this.toHex();
+  },
+  toHex() {
     return bytesToHex(this._bytes);
+  },
+  toBytes() {
+    return this._bytes;
   }
 });
 
