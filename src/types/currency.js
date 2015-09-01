@@ -33,6 +33,9 @@ const Currency = makeClass({
     this.classify();
   },
   static: {
+    init() {
+      this.XRP = new this(new Uint8Array(20));
+    },
     from(val) {
       if (val instanceof this) {
         return val;
@@ -48,7 +51,8 @@ const Currency = makeClass({
   },
   classify() {
     // We only have a non null iso() property available if the currency can be
-    // losslessly represented by the 3 letter iso code. Otherwise we use iso.
+    // losslessly represented by the 3 letter iso code. If none is available a
+    // hex encoding of the full 20 bytes is the canonical representation.
     let onlyISO = true;
 
     const bytes = this._bytes;
@@ -73,7 +77,6 @@ const Currency = makeClass({
   }
 });
 
-Currency.XRP = new Currency(new Uint8Array(20));
 module.exports = {
   Currency
 };
