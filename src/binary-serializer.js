@@ -28,20 +28,13 @@ const BytesList = makeClass({
       sink.put(arr);
     });
   },
-  toBytes(To = Uint8Array) {
-    const concatenated = new To(this.length);
+  toBytes() {
+    const concatenated = new Uint8Array(this.length);
     let pointer = 0;
-    if (To === Uint8Array) {
-      this.arrays.forEach(arr => {
-        concatenated.set(arr, pointer);
-        pointer += arr.length;
-      });
-    } else {
-      this.arrays.forEach(arr => {
-        concatenated.splice(pointer, arr.length, ...arr);
-        pointer += arr.length;
-      });
-    }
+    this.arrays.forEach(arr => {
+      concatenated.set(arr, pointer);
+      pointer += arr.length;
+    });
     return concatenated;
   },
   toHex() {

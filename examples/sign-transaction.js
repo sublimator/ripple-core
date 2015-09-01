@@ -23,7 +23,7 @@ function signTxJson(seed, tx_json) {
   tx.TxnSignature = keyPair.signHex(signingData(tx));
 
   const serialized = serializeObject(tx);
-  const hash = sha512Half(PREFIXES.id, serialized).toHex();
+  const hash = bytesToHex(sha512Half(PREFIXES.id, serialized));
   const tx_blob = bytesToHex(serialized);
 
   return {

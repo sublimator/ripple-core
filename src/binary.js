@@ -11,22 +11,20 @@ const {bytesToHex, slice, parseBytes} = require('./bytes-utils');
 const makeParser = bytes => new BinaryParser(bytes);
 const readJSON = parser => parser.readType(types.STObject).toJSON();
 
-function serializeObject(object, prefix, _To) {
+function serializeObject(object, prefix) {
   const bytesList = new BytesList();
   const serializer = new BinarySerializer(bytesList);
-  const prefixIsTo = typeof prefix === 'function';
-  if (prefix && !prefixIsTo) {
+  if (prefix) {
     serializer.put(prefix);
   }
-  const To = prefixIsTo ? prefix : _To;
   types.STObject.from(object).toBytesSink(serializer);
-  return To === 'hex' ? bytesList.toHex() : bytesList.toBytes(To);
+  return bytesList.toBytes();
 }
 
 function sha512Half(...args) {
   const hash = hashjs.sha512();
   args.forEach(a => hash.update(a));
-  return new types.Hash256(hash.digest().slice(0, 32));
+  return parseBytes(hash.digest().slice(0, 32), Uint8Array);
 }
 
 module.exports = {
