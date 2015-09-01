@@ -2,17 +2,45 @@
 /* eslint-disable curly */
 'use strict';
 
+const yargs = require('yargs');
 const assert = require('assert-diff');
 const _ = require('lodash');
 const Sequelize = require('sequelize');
-const {STObject, binary: {readJSON, makeParser}} = require('../src');
+const {STObject, binary} = require('../src');
+const {BytesList, readJSON, makeParser} = binary;
 
-function binaryToJSON(binary) {
-  return readJSON(makeParser(binary));
+function rekey(obj, mapping) {
+  return _.transform(mapping, (to, v, k) => {
+    const arg = obj[k];
+    if (arg) {
+      to[v] = arg;
+    }
+  });
+}
+
+function binaryToJSON(bytes) {
+  return readJSON(makeParser(bytes));
 }
 
 function prettyJSON(value) {
   return JSON.stringify(value, null, 2);
+}
+
+function assertRecyclable(json) {
+  const recycled = STObject.from(json).toJSON();
+  assert.deepEqual(recycled, json);
+  const sink = new BytesList();
+  STObject.from(recycled).toBytesSink(sink);
+  const recycledAgain = binaryToJSON(sink.toHex());
+  assert.deepEqual(recycledAgain, json);
+  recycledAgain.inSpanner = 'works';
+  assert.throws(() => assert.deepEqual(recycledAgain, json));
+}
+
+function recycleTest(txn) {
+  const {tx_json, meta} = txn;
+  assertRecyclable(tx_json);
+  assertRecyclable(meta);
 }
 
 function makeTransactionModel(sequelize) {
@@ -26,24 +54,30 @@ function makeTransactionModel(sequelize) {
     RawTxn: {type: Sequelize.BLOB},
     TxnMeta: {type: Sequelize.BLOB}
   };
-
-  const instanceMethods = {
-    toJSON() {
-      const tx_json = binaryToJSON(this.RawTxn);
-      const hash = this.TransID;
-      const meta = binaryToJSON(this.TxnMeta);
-      const ledger_index = this.LedgerSeq;
-      return {hash, meta, tx_json, ledger_index};
-    }
-  };
-
   const config = {
     timestamps: false,
     freezeTableName: true,
-    instanceMethods
+    instanceMethods: {
+      toJSON() {
+        const tx_json = binaryToJSON(this.RawTxn);
+        const hash = this.TransID;
+        const meta = binaryToJSON(this.TxnMeta);
+        const ledger_index = this.LedgerSeq;
+        return {hash, meta, tx_json, ledger_index};
+      }
+    }
   };
-
   return sequelize.define('Transactions', transactionsTable, config);
+}
+
+function makeQuery(argv) {
+  const where = rekey(argv, {
+    hash: 'TransID',
+    ledger_index: 'LedgerSeq',
+    account: 'FromAcct',
+    type: 'TransType'
+  });
+  return {where, limit: argv.limit || 200};
 }
 
 function initDB(dbPath) {
@@ -54,55 +88,24 @@ function initDB(dbPath) {
   return {Transaction};
 }
 
-function makeQuery(argv) {
-  const mapping = {
-    hash: 'TransID',
-    ledger_index: 'LedgerSeq',
-    account: 'FromAcct',
-    type: 'TransType'
-  };
-  const where = _.transform(mapping, (to, v, k) => {
-    const arg = argv[k];
-    if (arg) {
-      to[v] = arg;
-    }
-  });
-  return {where, limit: argv.limit || 200};
+function getArgs() {
+  return yargs
+    .describe('db', 'abs path to transaction.db')
+    .describe('hash', 'hash of a transaction to dump')
+    .describe('ledger_index', 'restrict query to given ledger_index')
+    .describe('account', 'restrict query to given Account')
+    .describe('recycle_test', 'recycle json for integrity checks')
+    .describe('type', 'restrict query to given TransactionType')
+    .demand('db')
+  .argv;
 }
 
-function assertRecyclable(json) {
-  const {BytesList} = require('../src/binary-serializer');
-  const recycled = STObject.from(json).toJSON();
-  assert.deepEqual(recycled, json);
-  const sink = new BytesList();
-  STObject.from(recycled).toBytesSink(sink);
-  const recycledAgain = binaryToJSON(sink.toHex());
-  assert.deepEqual(recycledAgain, json);
-  recycledAgain.inSpanner = 'works';
-  assert.throws(() => assert.deepEqual(recycledAgain, json));
-}
-
-function recycleTest(txn) {
-  const {tx_json, meta} = txn.toJSON();
-  assertRecyclable(tx_json);
-  assertRecyclable(meta);
-}
-
-(function main() {
-  const argv = require('yargs')
-      .describe('db', 'abs path to transaction.db')
-      .describe('hash', 'hash of a transaction to dump')
-      .describe('ledger_index', 'restrict query to given ledger_index')
-      .describe('account', 'restrict query to given Account')
-      .describe('test_json', 'recycle json for integrity checks')
-      .describe('type', 'restrict query to given TransactionType')
-      .demand('db')
-      .argv;
+(function main(argv = getArgs()) {
   const {Transaction} = initDB(argv.db);
   const query = makeQuery(argv);
   Transaction.findAll(query).then(function(txns) {
-    if (argv.test_json) {
-      txns.forEach(recycleTest);
+    if (argv.recycle_test) {
+      txns.forEach(tx => recycleTest(tx.toJSON()));
     }
 
     console.log(prettyJSON(txns));
