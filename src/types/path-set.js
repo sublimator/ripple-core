@@ -1,7 +1,9 @@
 'use strict';
 /* eslint-disable no-unused-expressions */
 
+const _ = require('lodash');
 const makeClass = require('../make-class');
+const {ensureArrayLike} = require('./serialized-type');
 const {Currency} = require('./currency');
 const {AccountID} = require('./account-id');
 
@@ -13,6 +15,22 @@ const TYPE_ISSUER = 0x20;
 
 const Hop = makeClass({
   static: {
+    from(value) {
+      if (value instanceof this) {
+        return value;
+      }
+      return _.transform(value, (to, v, k) => {
+        switch (k) {
+          case 'issuer':
+          case 'account':
+            to[k] = AccountID.from(v);
+            break;
+          case 'currency':
+            to[k] = Currency.from(v);
+            break;
+        }
+      }, new this());
+    },
     parse(parser, type) {
       const hop = new Hop();
       (type & TYPE_ACCOUNT) && (hop.account = AccountID.fromParser(parser));
@@ -40,6 +58,11 @@ const Hop = makeClass({
 
 const Path = makeClass({
   extends: Array,
+  static: {
+    from(value) {
+      return ensureArrayLike(Path, Hop, value);
+    }
+  },
   toJSON() {
     return this.map(k => k.toJSON());
   }
@@ -49,13 +72,10 @@ const PathSet = makeClass({
   extends: Array,
   static: {
     from(value) {
-      if (value instanceof this) {
-        return value;
-      }
-      throw new Error('unimplemented');
+      return ensureArrayLike(this, Path, value);
     },
     fromParser(parser) {
-      const pathSet = new PathSet();
+      const pathSet = new this();
       let path;
       while (!parser.end()) {
         const type = parser.readUInt8();

@@ -9,8 +9,10 @@ const HEX_REGEX = /^[A-F0-9]{40}$/;
 
 function isoToBytes(iso) {
   const bytes = new Uint8Array(20);
-  const isoBytes = iso.split('').map(c => c.charCodeAt(0));
-  bytes.set(isoBytes, 12);
+  if (iso !== 'XRP') {
+    const isoBytes = iso.split('').map(c => c.charCodeAt(0));
+    bytes.set(isoBytes, 12);
+  }
   return bytes;
 }
 

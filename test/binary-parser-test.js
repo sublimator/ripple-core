@@ -7,13 +7,13 @@ const coreTypes = require('../src');
 const _ = require('lodash');
 const assert = require('assert-diff');
 const {encodeAccountID} = require('ripple-address-codec');
-
 const {binary: {makeParser, readJSON}, Field, Amount, Hash160} = coreTypes;
 const {Enums: {TransactionType}} = coreTypes;
 const utils = require('./utils');
 const {parseHexOnly, assertEqualAmountJSON, hexOnly, loadFixture} = utils;
 const {bytesToHex} = require('../src/bytes-utils');
 const fixtures = loadFixture('data-driven-tests.json');
+const {BytesList} = require('../src/binary-serializer');
 
 const __ = hexOnly;
 function unused() {}
@@ -196,6 +196,18 @@ function fieldParsingTests() {
   });
 }
 
+function assertRecyclable(json, forField) {
+  const Type = forField.associatedType;
+  const recycled = Type.from(json).toJSON();
+  assert.deepEqual(recycled, json);
+  const sink = new BytesList();
+  Type.from(recycled).toBytesSink(sink);
+  const recycledAgain = makeParser(sink.toHex())
+                          .readType(Type)
+                          .toJSON();
+  assert.deepEqual(recycledAgain, json);
+}
+
 function nestedObjectTests() {
   function disabled(i) {
     unused(i);
@@ -226,6 +238,7 @@ function nestedObjectTests() {
           throw new Error(`${e} ${field} a: ${actual} e: ${expectedJSON}`);
         }
         assert.equal(field.name, expectedField);
+        assertRecyclable(actual, field);
         ix++;
       }
     });
@@ -312,6 +325,11 @@ function pathSetBinaryTests() {
     const parser = makeParser(bytes);
     const txn = readJSON(parser);
     assert.deepEqual(txn.Paths, expectedJSON);
+    // TODO: this should go elsewhere
+    assert.deepEqual(
+      coreTypes.PathSet.from(txn.Paths).toJSON(),
+      expectedJSON
+    );
   });
 }
 
@@ -321,22 +339,28 @@ function parseLedger4320278() {
     ripple = ripple._DEPRECATED;
   }
   ripple.Amount.strict_mode = false;
+  ripple = false;
 
   it(`can parse object`, () => {
     const json = loadFixture('as-ledger-4320278.json');
     this.timeout(0);
 
     json.forEach((e, i) => {
-      const actual = readJSON(makeParser(e.binary));
-      // const actual = new ripple.SerializedObject(e.binary).to_json();
       const expected = e.json;
+      const actual = readJSON(makeParser(e.binary));
       actual.index = expected.index;
+      // const actual = new ripple.SerializedObject(e.binary).to_json();
       try {
         assert.deepEqual(actual, expected);
       } catch(error) {
         console.log('error', i, !ripple && error);
       }
     });
+
+    const {AccountID} = coreTypes;
+    console.log('cacheSize', Object.keys(coreTypes.AccountID.cache).length);
+    console.log('cacheHits', AccountID.cacheHits);
+    console.log('cacheMisses', AccountID.cacheMisses);
   });
 }
 

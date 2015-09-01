@@ -20,7 +20,9 @@ const UInt64 = makeClass({
       this._numeric = arg;
     } else {
       if (argType === 'string') {
-        assert(arg.match(/[A-F]{16}/));
+        if (!arg.match(/^[A-F0-9]{16}$/)) {
+          throw new Error(`${arg} is not a valid UInt64 hex string`);
+        }
       }
       this._bytes = parseBytes(arg, Uint8Array);
     }

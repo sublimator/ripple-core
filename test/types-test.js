@@ -1,6 +1,5 @@
 'use strict';
 
-
 const _ = require('lodash');
 const assert = require('assert');
 const coreTypes = require('../src/types');
@@ -24,6 +23,10 @@ describe('SerializedType interfaces', function() {
     });
     it(`${name} instances have toJSON`, function() {
       assert(new Value().toJSON);
+    });
+    it(`${name}.from(json).toJSON() == json`, function() {
+      const newJSON = new Value().toJSON();
+      assert.deepEqual(Value.from(newJSON).toJSON(), newJSON);
     });
   });
 });

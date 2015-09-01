@@ -2,6 +2,7 @@
 
 const makeClass = require('../make-class');
 const {Hash256} = require('./hash-256');
+const {ensureArrayLike} = require('./serialized-type');
 
 const Vector256 = makeClass({
   extends: Array,
@@ -16,10 +17,7 @@ const Vector256 = makeClass({
       return vector256;
     },
     from(value) {
-      if (value instanceof this) {
-        return value;
-      }
-      throw new Error('unimplemented');
+      return ensureArrayLike(this, Hash256, value);
     }
   },
   toBytesSink(sink) {

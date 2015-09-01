@@ -2,9 +2,10 @@
 /* eslint-disable curly */
 'use strict';
 
+const assert = require('assert-diff');
 const _ = require('lodash');
 const Sequelize = require('sequelize');
-const {binary: {readJSON, makeParser}} = require('../src');
+const {STObject, binary: {readJSON, makeParser}} = require('../src');
 
 function binaryToJSON(binary) {
   return readJSON(makeParser(binary));
@@ -29,10 +30,10 @@ function makeTransactionModel(sequelize) {
   const instanceMethods = {
     toJSON() {
       const tx_json = binaryToJSON(this.RawTxn);
-      tx_json.hash = this.TransID;
+      const hash = this.TransID;
       const meta = binaryToJSON(this.TxnMeta);
       const ledger_index = this.LedgerSeq;
-      return {meta, tx_json, ledger_index};
+      return {hash, meta, tx_json, ledger_index};
     }
   };
 
@@ -69,20 +70,43 @@ function makeQuery(argv) {
   return {where, limit: argv.limit || 200};
 }
 
+function assertRecyclable(json) {
+  const {BytesList} = require('../src/binary-serializer');
+  const recycled = STObject.from(json).toJSON();
+  assert.deepEqual(recycled, json);
+  const sink = new BytesList();
+  STObject.from(recycled).toBytesSink(sink);
+  const recycledAgain = binaryToJSON(sink.toHex());
+  assert.deepEqual(recycledAgain, json);
+  recycledAgain.inSpanner = 'works';
+  assert.throws(() => assert.deepEqual(recycledAgain, json));
+}
+
+function recycleTest(txn) {
+  const {tx_json, meta} = txn.toJSON();
+  assertRecyclable(tx_json);
+  assertRecyclable(meta);
+}
+
 (function main() {
   const argv = require('yargs')
       .describe('db', 'abs path to transaction.db')
       .describe('hash', 'hash of a transaction to dump')
       .describe('ledger_index', 'restrict query to given ledger_index')
       .describe('account', 'restrict query to given Account')
+      .describe('test_json', 'recycle json for integrity checks')
       .describe('type', 'restrict query to given TransactionType')
       .demand('db')
       .argv;
   const {Transaction} = initDB(argv.db);
   const query = makeQuery(argv);
   Transaction.findAll(query).then(function(txns) {
+    if (argv.test_json) {
+      txns.forEach(recycleTest);
+    }
+
     console.log(prettyJSON(txns));
     // support script.js $argv > dump.json
-    console.error({query});
+    console.error({query, count: txns.length});
   });
 }());

@@ -34,7 +34,7 @@ const STObject = makeClass({
           }
         }, new this());
       }
-      throw new Error('unimplemented');
+      throw new Error(`${value} is unsupported`);
     }
   },
   fieldKeys() {
