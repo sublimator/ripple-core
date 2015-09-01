@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const util = require('util');
+const inherits = require('inherits');
 
 function forEach(obj, func) {
   Object.keys(obj || {}).forEach(k => {
@@ -28,7 +28,8 @@ module.exports = function makeClass(klass_, definition_) {
       };
     }
     /* eslint-disable no-proto */
-    util.inherits(klass, parent);
+    // TODO: fix-me!
+    inherits(klass, parent);
     klass.__proto__ = parent;
     /* eslint-enable no-proto */
   }
@@ -57,7 +58,7 @@ module.exports = function makeClass(klass_, definition_) {
     }
   });
   _.assign(klass, definition.static);
-  if (klass.init) {
+  if (typeof klass.init === 'function') {
     klass.init();
   }
   forEach(definition.cached, f => {
