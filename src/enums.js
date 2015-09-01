@@ -6,6 +6,10 @@ const {parseBytes, serializeUIntN} = require('./bytes-utils');
 const makeClass = require('./make-class');
 const enums = require('./enum-definitions.json');
 
+function transformWith(func, obj) {
+  return _.transform(obj, func);
+}
+
 function biMap(obj, valueKey) {
   return _.transform(obj, (result, value, key) => {
     result[key] = value;
@@ -59,49 +63,40 @@ const EnumType = makeClass({
   }
 });
 
-const Type = makeClass({
-  extends: EnumType,
-  static: {
-    enumName: 'Type',
+function makeEnum(name, definition) {
+  return makeClass({
+    extends: EnumType,
+    static: _.assign(definition, {enumName: name})
+  });
+}
+
+function makeEnums(to, definition, name) {
+  to[name] = makeEnum(name, definition);
+}
+
+const Enums = transformWith(makeEnums, {
+  Type: {
     initVals: enums.TYPES
+  },
+  LedgerEntryType: {
+    initVals: enums.LEDGER_ENTRY_TYPES, ordinalByteWidth: 2
+  },
+  TransactionType: {
+    initVals: enums.TRANSACTION_TYPES, ordinalByteWidth: 2
+  },
+  TransactionResult: {
+    initVals: enums.TRANSACTION_RESULTS, ordinalByteWidth: 1
   }
 });
 
-const LedgerEntryType = makeClass({
-  extends: EnumType,
-  static: {
-    enumName: 'LedgerEntryType',
-    initVals: enums.LEDGER_ENTRY_TYPES,
-    ordinalByteWidth: 2
-  }
-});
-
-const TransactionType = makeClass({
-  extends: EnumType,
-  static: {
-    enumName: 'TransactionType',
-    initVals: enums.TRANSACTION_TYPES,
-    ordinalByteWidth: 2
-  }
-});
-
-const TransactionResult = makeClass({
-  extends: EnumType,
-  static: {
-    enumName: 'TransactionResult',
-    initVals: enums.TRANSACTION_RESULTS,
-    ordinalByteWidth: 1
-  }
-});
-
-const Field = makeClass({
+Enums.Field = makeClass({
   extends: EnumType,
   static: {
     enumName: 'Field',
     initVals: enums.FIELDS,
     valuesByName() {
       const fields = _.map(this.initVals, ([name, definition]) => {
-        const type = Type[definition.type];
+        const type = Enums.Type[definition.type];
         const bytes = this.header(type.ordinal, definition.nth);
         const ordinal = type.ordinal << 16 | definition.nth;
         const extra = {ordinal, name, type, bytes};
@@ -126,20 +121,7 @@ const Field = makeClass({
       }
       return parseBytes(header, Uint8Array);
     }
-  },
-  toString() {
-    return this.name;
   }
 });
 
-const Enums = {
-  LedgerEntryType,
-  TransactionType,
-  TransactionResult
-};
-
-module.exports = {
-  Type,
-  Field,
-  Enums
-};
+module.exports = Enums;

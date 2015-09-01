@@ -1,6 +1,7 @@
 'use strict';
 
-const {Field, Enums} = require('../enums');
+const enums = require('../enums');
+const {Field} = enums;
 const {AccountID} = require('./account-id');
 const {Amount} = require('./amount');
 const {Blob} = require('./blob');
@@ -39,8 +40,8 @@ Field.values.forEach(field => {
   field.associatedType = coreTypes[field.type];
 });
 
-Field.TransactionType.associatedType = Enums.TransactionType;
-Field.TransactionResult.associatedType = Enums.TransactionResult;
-Field.LedgerEntryType.associatedType = Enums.LedgerEntryType;
+Field.TransactionType.associatedType = enums.TransactionType;
+Field.TransactionResult.associatedType = enums.TransactionResult;
+Field.LedgerEntryType.associatedType = enums.LedgerEntryType;
 
 module.exports = coreTypes;
