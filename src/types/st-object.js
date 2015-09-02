@@ -94,6 +94,9 @@ const STObject = makeClass({
     const sorted = _.sortBy(fields, 'ordinal');
     sorted.forEach((field) => {
       const value = this[field];
+      if (!field.isSerialized) {
+        return;
+      }
       // const haveValue = value !== undefined;
       // if (!haveValue) {
       //   // if (this.format /* && field optional for format */) {

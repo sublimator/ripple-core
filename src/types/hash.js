@@ -14,7 +14,7 @@ const Hash = makeClass({
   static: {
     width: NaN,
     from(value) {
-      if (typeof value === 'object' && value instanceof this) {
+      if (value instanceof this) {
         return value;
       }
       return new this(parseBytes(value));
@@ -39,11 +39,24 @@ const Hash = makeClass({
   toBytesSink(sink) {
     sink.put(this._bytes);
   },
+  nibblet(depth) {
+    const byte_ix = depth > 0 ? (depth / 2) | 0 : 0;
+    let b = this._bytes[byte_ix];
+    if (depth % 2 === 0) {
+      b = (b & 0xF0) >>> 4;
+    } else {
+      b = b & 0x0F;
+    }
+    return b;
+  },
   toJSON() {
     return this.toHex();
   },
   toHex() {
     return bytesToHex(this._bytes);
+  },
+  toString() {
+    return this.toHex();
   }
 });
 

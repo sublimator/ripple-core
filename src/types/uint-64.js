@@ -6,6 +6,8 @@ const makeClass = require('../make-class');
 const {bytesToHex, parseBytes, serializeUIntN} = require('../bytes-utils');
 const {UInt} = require('./uint');
 
+const HEX_REGEX = /^[A-F0-9]{16}$/;
+
 const UInt64 = makeClass({
   extends: UInt,
   static: {width: 8},
@@ -20,7 +22,7 @@ const UInt64 = makeClass({
       this._numeric = arg;
     } else {
       if (argType === 'string') {
-        if (!arg.match(/^[A-F0-9]{16}$/)) {
+        if (!HEX_REGEX.test(arg)) {
           throw new Error(`${arg} is not a valid UInt64 hex string`);
         }
       }

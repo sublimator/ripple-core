@@ -34,18 +34,27 @@ function bytesToHex(sequence) {
   return buf.join('');
 }
 
-function parseBytes(val, Output = Array) {
-  if (!val || !val.length) {
-    throw new Error(`${val} is not a hex string or bytes sequence`);
+function byteForHex(hex) {
+  const byte = hexLookup[hex];
+  if (byte === undefined) {
+    throw new Error(`\`${hex}\` is not a valid hex representation of a byte`);
   }
+  return byte;
+}
+
+function parseBytes(val, Output = Array) {
+  if (!val || val.length === undefined) {
+    throw new Error(`${val} is not a sequence`);
+  }
+
   if (typeof val === 'string') {
     const start = val.length % 2;
     const res = new Output((val.length + start) / 2);
-    for (let i = val.length, to = res.length - 1; to >= 0; i -= 2, to--) {
-      res[to] = hexLookup[val.slice(i - 2, i)];
+    for (let i = val.length, to = res.length - 1; to >= start; i -= 2, to--) {
+      res[to] = byteForHex(val.slice(i - 2, i));
     }
     if (start === 1) {
-      res[0] = hexLookup[val[0]];
+      res[0] = byteForHex(val[0]);
     }
     return res;
   } else if (val instanceof Output) {

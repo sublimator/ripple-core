@@ -69,3 +69,7 @@ test/fixtures/as-ledger-4320278.json
 
 # WIP examples
 # examples
+
+# Huge ledger dumps
+test/fixtures/14280680.json
+test/fixtures/ledger-4320277.json

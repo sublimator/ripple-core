@@ -7,12 +7,12 @@ const {slice, compareBytes, parseBytes, bytesToHex} = bytesUtils;
 describe('bytes-utils', function() {
   describe('parseBytes', function() {
     it('can decode hex', function() {
-      assert.deepEqual(parseBytes('012'), [0x00, 0x12]);
+      assert.deepEqual(parseBytes('0012'), [0x00, 0x12]);
       assert.deepEqual(parseBytes('0012'), [0x00, 0x12]);
       assert.deepEqual(parseBytes('00AA'), [0x00, 0xaa]);
     });
     it('can decode hex to a Uint8Array', function() {
-      const result = parseBytes('012', Uint8Array);
+      const result = parseBytes('0012', Uint8Array);
       assert(result instanceof Uint8Array);
       assert.deepEqual(result, [0x00, 0x12]);
     });
@@ -22,7 +22,7 @@ describe('bytes-utils', function() {
       assert.deepEqual(result, [0x00, 0x12]);
     });
     it('can decode hex to a Buffer', function() {
-      const result = parseBytes('012', Buffer);
+      const result = parseBytes('0012', Buffer);
       assert(result instanceof Buffer);
       assert.deepEqual(result.toJSON().data, [0x00, 0x12]);
     });

@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert-diff');
-const {Hash160, Currency, AccountID} = require('../src');
+const {Hash160, Hash256, Currency, AccountID} = require('../src');
 
 describe('Hash160', function() {
   it('has a static width membmer', function() {
@@ -20,6 +20,27 @@ describe('Hash160', function() {
   });
 });
 
+describe('Hash256', function() {
+  it('has a static width membmer', function() {
+    assert.equal(Hash256.width, 32);
+  });
+  it('has a ZERO_256 member', function() {
+    assert.equal(
+      Hash256.ZERO_256.toJSON(),
+      '0000000000000000000000000000000000000000000000000000000000000000');
+  });
+  it('supports getting the nibblet values at given positions', function() {
+    const h = Hash256.from(
+        '1359BD0000000000000000000000000000000000000000000000000000000000');
+    assert.equal(h.nibblet(0), 0x1);
+    assert.equal(h.nibblet(1), 0x3);
+    assert.equal(h.nibblet(2), 0x5);
+    assert.equal(h.nibblet(3), 0x9);
+    assert.equal(h.nibblet(4), 0x0b);
+    assert.equal(h.nibblet(5), 0xd);
+  });
+});
+
 describe('Currency', function() {
   it('Will have a null iso() for dodgy XRP ', function() {
     const bad = Currency.from('0000000000000000000000005852500000000000');
@@ -32,7 +53,6 @@ describe('Currency', function() {
   });
   it('throws on invalid reprs', function() {
     assert.throws(() => Currency.from(new Uint8Array(19)));
-    assert.throws(() => Currency.from('usd'));
     assert.throws(() => Currency.from(1));
     assert.throws(() => Currency.from(
                         '00000000000000000000000000000000000000m'));

@@ -28,12 +28,12 @@
     "eslint": "^1.2.1",
     "eslint-watch": "^2.0.0",
     "istanbul": "~0.3.5",
-    "mocha": "~2.2.5",
+    "mocha": "^2.3.0",
+    "ripple-keypairs": "^0.8.0",
     "ripple-lib": "^0.12.4",
     "sequelize": "^3.6.0",
     "sqlite3": "^3.0.10",
-    "yargs": "^3.21.0",
-    "ripple-keypairs": "^0.8.0"
+    "yargs": "^3.21.0"
   },
   "scripts": {
     "compile": "babel --optional runtime -d distrib/npm/ src/",

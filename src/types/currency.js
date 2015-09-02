@@ -17,11 +17,11 @@ function isoToBytes(iso) {
 }
 
 function isISOCode(val) {
-  return val.match(ISO_REGEX);
+  return val.length === 3; // ISO_REGEX.test(val);
 }
 
 function isHex(val) {
-  return val.match(HEX_REGEX);
+  return HEX_REGEX.test(val);
 }
 
 function isStringRepr(val) {
@@ -42,17 +42,13 @@ function bytesFromRepr(val) {
     // 20 or 40.
     return val.length === 3 ? isoToBytes(val) : val;
   }
-   throw new Error(`Unsupported Currency repr: ${val}`);
+  throw new Error(`Unsupported Currency repr: ${val}`);
 }
 
 const $uper = Hash160.prototype;
 const Currency = makeClass({
   extends: Hash160,
   getters: ['isNative', 'iso'],
-  Currency(bytes) {
-    Hash160.call(this, bytes);
-    this.classify();
-  },
   static: {
     init() {
       this.XRP = new this(new Uint8Array(20));
@@ -60,6 +56,10 @@ const Currency = makeClass({
     from(val) {
       return val instanceof this ? val : new this(bytesFromRepr(val));
     }
+  },
+  Currency(bytes) {
+    Hash160.call(this, bytes);
+    this.classify();
   },
   classify() {
     // We only have a non null iso() property available if the currency can be
@@ -77,7 +77,7 @@ const Currency = makeClass({
         break;
       }
     }
-    const lossLessISO = onlyISO && iso !== 'XRP' && iso.match(ISO_REGEX);
+    const lossLessISO = onlyISO && iso !== 'XRP' && ISO_REGEX.test(iso);
     this._isNative = onlyISO && _.isEqual(code, [0, 0, 0]);
     this._iso = this._isNative ? 'XRP' : lossLessISO ? iso : null;
   },
