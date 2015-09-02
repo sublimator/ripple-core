@@ -26,4 +26,15 @@ describe('Currency', function() {
     assert.equal(bad.iso(), null);
     assert.equal(bad.isNative(), false);
   });
+  it('can be constructed from an Array', function() {
+    const xrp = Currency.from(new Uint8Array(20));
+    assert.equal(xrp.iso(), 'XRP');
+  });
+  it('throws on invalid reprs', function() {
+    assert.throws(() => Currency.from(new Uint8Array(19)));
+    assert.throws(() => Currency.from('usd'));
+    assert.throws(() => Currency.from(1));
+    assert.throws(() => Currency.from(
+                        '00000000000000000000000000000000000000m'));
+  });
 });

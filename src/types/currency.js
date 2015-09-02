@@ -17,11 +17,32 @@ function isoToBytes(iso) {
 }
 
 function isISOCode(val) {
-  return _.isString(val) && val.length === 3 && val.match(ISO_REGEX);
+  return val.match(ISO_REGEX);
 }
 
 function isHex(val) {
-  return _.isString(val) && val.match(HEX_REGEX);
+  return val.match(HEX_REGEX);
+}
+
+function isStringRepr(val) {
+  return _.isString(val) && (isHex(val) || isISOCode(val));
+}
+
+function isBytesArray(val) {
+  return val.length === 20;
+}
+
+function isValidRepr(val) {
+  return isStringRepr(val) || isBytesArray(val);
+}
+
+function bytesFromRepr(val) {
+  if (isValidRepr(val)) {
+    // We assume at this point that we have an object with a length, either 3,
+    // 20 or 40.
+    return val.length === 3 ? isoToBytes(val) : val;
+  }
+   throw new Error(`Unsupported Currency repr: ${val}`);
 }
 
 const $uper = Hash160.prototype;
@@ -37,16 +58,7 @@ const Currency = makeClass({
       this.XRP = new this(new Uint8Array(20));
     },
     from(val) {
-      if (val instanceof this) {
-        return val;
-      }
-      const bytes = isISOCode(val) ? isoToBytes(val) :
-                    isHex(val) ? val :
-                    null;
-      if (bytes) {
-        return new this(bytes);
-      }
-      throw new Error(`value ${val} unsupported`);
+      return val instanceof this ? val : new this(bytesFromRepr(val));
     }
   },
   classify() {
