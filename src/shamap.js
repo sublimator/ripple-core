@@ -5,7 +5,7 @@ const makeClass = require('./make-class');
 const {BytesSink} = require('./binary-serializer');
 const {Hash256} = require('./types');
 // TODO: this is really slow ?
-const {sha512} = require('hash.js');
+const hashjs = require('hash.js');
 
 const PREFIXES = {
   AS_LEAF: [0x4D, 0x4C, 0x4E, 0x00],
@@ -16,7 +16,7 @@ const PREFIXES = {
 const Hasher = makeClass({
   implements: BytesSink,
   Hasher() {
-    this.hash = sha512();
+    this.hash = hashjs.sha512();
   },
   static: {
     put(bytes) {
@@ -28,26 +28,23 @@ const Hasher = makeClass({
     return this;
   },
   finish() {
-    return new Hash256(this.hash.digest().slice(0, 32));
+    const bytes = this.hash.digest();
+    return new Hash256(bytes.slice(0, 32));
   }
 });
 
 const ShaMapNode = makeClass({
-  ShaMapNode() {
-    this._hash = null;
-  },
   virtuals: {
     hashPrefix() {},
     isLeaf() {},
     isInner() {}
   },
-  hash() {
-    if (this._hash === null) {
+  cached: {
+    hash() {
       const hasher = Hasher.put(this.hashPrefix());
       this.toBytesSink(hasher);
-      this._hash = hasher.finish();
+      return hasher.finish();
     }
-    return this._hash;
   }
 });
 
@@ -92,7 +89,6 @@ const ShaMapInner = makeClass({
   hashPrefix() {
     return PREFIXES.INNER;
   },
-
   setBranch(slot, branch) {
     this.slotBits = this.slotBits | (1 << slot);
     this.branches[slot] = branch;
@@ -100,7 +96,6 @@ const ShaMapInner = makeClass({
   empty() {
     return this.slotBits === 0;
   },
-
   hash() {
     if (this.empty()) {
       return Hash256.ZERO_256;
@@ -114,7 +109,6 @@ const ShaMapInner = makeClass({
       hash.toBytesSink(sink);
     }
   },
-
   addItem(index, item, leaf) {
     assert(index instanceof Hash256);
     const nibble = index.nibblet(this.depth);
@@ -137,6 +131,7 @@ const ShaMapInner = makeClass({
 const ShaMap = makeClass({
   extends: ShaMapInner,
   static: {
+    // TODO: move these into hash-prefixes.js ;)
     PREFIXES
   }
 });
