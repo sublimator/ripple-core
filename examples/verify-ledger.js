@@ -6,7 +6,7 @@ const assert = require('assert');
 const path = require('path');
 const _ = require('lodash');
 const yargs = require('yargs');
-const {binary, ShaMap, STObject, Hash256} = require('../src');
+const {binary, ShaMap, STObject, HashPrefix, Hash256} = require('../src');
 const {BinarySerializer, serializeObject} = binary;
 
 function loadJSON(fn) {
@@ -18,7 +18,7 @@ function transactionItem(json) {
   const index = Hash256.from(json.hash);
   const item = {
     hashPrefix() {
-      return ShaMap.PREFIXES.TX_LEAF;
+      return HashPrefix.transaction;
     },
     toBytesSink(sink) {
       const serializer = new BinarySerializer(sink);
@@ -34,7 +34,7 @@ function entryItem(json) {
   const bytes = serializeObject(json);
   const item = {
     hashPrefix() {
-      return ShaMap.PREFIXES.AS_LEAF;
+      return HashPrefix.accountStateEntry;
     },
     toBytesSink(sink) {
       sink.put(bytes);

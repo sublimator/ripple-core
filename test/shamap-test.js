@@ -2,7 +2,7 @@
 
 const assert = require('assert-diff');
 const {ShaMap} = require('../src/shamap.js');
-const {binary: {serializeObject}, Hash256} = require('../src');
+const {binary: {serializeObject}, Hash256, HashPrefix} = require('../src');
 const {loadFixture} = require('./utils');
 
 function now() {
@@ -61,7 +61,7 @@ describe('ShaMap', () => {
       const map = new ShaMap();
       const ledger = loadFixture(fixture);
       // const t = now();
-      const leafNodePrefix = ShaMap.PREFIXES.AS_LEAF;
+      const leafNodePrefix = HashPrefix.accountStateEntry;
       ledger.accountState.map((e, i) => {
         if (i > 1000 & (i % 1000) === 0) {
           console.log(e.index);

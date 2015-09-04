@@ -4,14 +4,10 @@ const assert = require('assert');
 const makeClass = require('./make-class');
 const {BytesSink} = require('./binary-serializer');
 const {Hash256} = require('./types');
+const {HashPrefix} = require('./hash-prefixes');
+
 // TODO: this is really slow ?
 const hashjs = require('hash.js');
-
-const PREFIXES = {
-  AS_LEAF: [0x4D, 0x4C, 0x4E, 0x00],
-  TX_LEAF: [0x53, 0x4E, 0x44, 0x00],
-  INNER: [0x4D, 0x49, 0x4E, 0x00]
-};
 
 const Hasher = makeClass({
   implements: BytesSink,
@@ -87,7 +83,7 @@ const ShaMapInner = makeClass({
     return false;
   },
   hashPrefix() {
-    return PREFIXES.INNER;
+    return HashPrefix.innerNode;
   },
   setBranch(slot, branch) {
     this.slotBits = this.slotBits | (1 << slot);
@@ -129,11 +125,7 @@ const ShaMapInner = makeClass({
 });
 
 const ShaMap = makeClass({
-  extends: ShaMapInner,
-  static: {
-    // TODO: move these into hash-prefixes.js ;)
-    PREFIXES
-  }
+  extends: ShaMapInner
 });
 
 module.exports = {

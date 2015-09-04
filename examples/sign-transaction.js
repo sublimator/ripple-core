@@ -4,12 +4,9 @@
 'use strict';
 
 const path = require('path');
-const {STObject, binary} = require('../src');
+const {STObject, binary, HashPrefix} = require('../src');
 const {serializeObject, bytesToHex, sha512Half} = binary;
 const {keyPairFromSeed} = require('ripple-keypairs');
-
-const PREFIXES = {SIGNING: [0x53, 0x54, 0x58, 0x00],
-                       ID: [0x54, 0x58, 0x4E, 0x00]};
 
 const EXAMPLE = {
   secret: 'sEd7t79mzn2dwy3vvpvRmaaLbLhvme6',
@@ -26,7 +23,7 @@ const EXAMPLE = {
 
 const toHex = v => bytesToHex(v);
 const prettyJSON = obj => JSON.stringify(obj, undefined, 2);
-const signingData = tx => serializeObject(tx, PREFIXES.SIGNING);
+const signingData = tx => serializeObject(tx, HashPrefix.transactionSig);
 
 function signTxJson(secret, tx_json) {
   const keyPair = keyPairFromSeed(secret);
@@ -38,7 +35,7 @@ function signTxJson(secret, tx_json) {
   tx.TxnSignature = toHex(keyPair.sign(signingData(tx)));
 
   const serialized = serializeObject(tx);
-  const hash = toHex(sha512Half(PREFIXES.ID, serialized));
+  const hash = toHex(sha512Half(HashPrefix.transactionID, serialized));
   const tx_blob = toHex(serialized);
 
   return {

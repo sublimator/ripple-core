@@ -6,10 +6,12 @@ const {Field} = enums;
 const types = require('./types');
 const binary = require('./binary');
 const {ShaMap} = require('./shamap');
+const {HashPrefix} = require('./hash-prefixes');
 
 module.exports = _.assign({
-  Field,
   ShaMap,
+  HashPrefix,
+  Field,
   enums,
   binary
 },
