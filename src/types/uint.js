@@ -3,6 +3,7 @@
 const assert = require('assert');
 const BN = require('bn.js');
 const makeClass = require('../make-class');
+const {Comparable, SerializedType} = require('./serialized-type');
 const {serializeUIntN} = require('../bytes-utils');
 const MAX_VALUES = [0, 255, 65535, 16777215, 4294967295];
 
@@ -11,8 +12,8 @@ function signum(a, b) {
 }
 
 const UInt = makeClass({
-  UInt(val_) {
-    const val = val_ || 0;
+  mixin: [Comparable, SerializedType],
+  UInt(val = 0) {
     const max = MAX_VALUES[this.constructor.width];
     if (val < 0 || !(val <= max)) {
       throw new Error(`${val} not in range 0 <= $val <= ${max}`);
@@ -36,12 +37,9 @@ const UInt = makeClass({
   valueOf() {
     return this.val;
   },
-  numeric() {
-    return this.val;
-  },
   compareTo(other) {
-    const thisValue = this.numeric();
-    const otherValue = other.numeric();
+    const thisValue = this.valueOf();
+    const otherValue = other.valueOf();
     if (thisValue instanceof BN) {
       return otherValue instanceof BN ?
                   thisValue.cmp(otherValue) :
@@ -50,10 +48,7 @@ const UInt = makeClass({
       return -other.compareTo(this);
     }
     assert(typeof otherValue === 'number');
-    return signum(thisValue - otherValue);
-  },
-  equalTo(other) {
-    return this.compareTo(other) === 0;
+    return signum(thisValue, otherValue);
   },
   toBytesSink(sink) {
     sink.put(this.toBytes());

@@ -2,9 +2,10 @@
 
 const makeClass = require('../make-class');
 const {Hash256} = require('./hash-256');
-const {ensureArrayLike} = require('./serialized-type');
+const {ensureArrayLike, SerializedType} = require('./serialized-type');
 
 const Vector256 = makeClass({
+  mixin: SerializedType,
   extends: Array,
   static: {
     fromParser(parser, hint) {

@@ -9,6 +9,10 @@ function forEach(obj, func) {
   });
 }
 
+function ensureArray(val) {
+  return Array.isArray(val) ? val : [val];
+}
+
 module.exports = function makeClass(klass_, definition_) {
   const definition = definition_ || klass_;
   let klass = typeof klass_ === 'function' ? klass_ : null;
@@ -68,6 +72,14 @@ module.exports = function makeClass(klass_, definition_) {
       return value;
     });
   });
+  if (definition.mixin) {
+    const mixin = {};
+    // Right-most in the list win
+    ensureArray(definition.mixin).reverse().forEach(o => {
+      _.defaults(mixin, o);
+    });
+    _.defaults(proto, mixin);
+  }
 
   return klass;
 };

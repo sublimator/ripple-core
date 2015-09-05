@@ -1,12 +1,13 @@
 'use strict';
 
 const makeClass = require('../make-class');
-const {ensureArrayLike} = require('./serialized-type');
+const {ensureArrayLike, SerializedType} = require('./serialized-type');
 const {Field} = require('../enums');
 const {STObject} = require('./st-object');
 const {ArrayEndMarker} = Field;
 
 const STArray = makeClass({
+  mixin: SerializedType,
   extends: Array,
   static: {
     fromParser(parser) {

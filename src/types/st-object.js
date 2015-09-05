@@ -6,20 +6,10 @@ const makeClass = require('../make-class');
 const {Field} = require('../enums');
 const {BinarySerializer} = require('../binary-serializer');
 const {ObjectEndMarker} = Field;
-
-// const Payment = _.map([
-//   'Account',
-//   'Amount',
-//   'Destination',
-//   'Fee',
-//   'Flags',
-//   'Sequence',
-//   'TransactionType',
-//   'SigningPubKey',
-//   'TxnSignature'
-// ], (f) => Field[f]);
+const {SerializedType} = require('./serialized-type');
 
 const STObject = makeClass({
+  mixin: SerializedType,
   static: {
     fromParser(parser, hint) {
       const end = typeof hint === 'number' ? parser.pos() + hint : null;
@@ -58,36 +48,6 @@ const STObject = makeClass({
       result[key] = value && value.toJSON ? value.toJSON() : value;
     });
   },
-  // formatted() {
-  //   if (String(this.TransactionType) === 'Payment') {
-  //     Object.defineProperty(this, 'format', {
-  //       enumerable: false,
-  //       value: Payment
-  //     });
-  //     Payment.forEach((f) => {
-  //       let value = this[f];
-  //       Object.defineProperty(this, f.name, {
-  //         enumerable: true,
-  //         configurable: false,
-  //         get() {
-  //           return value;
-  //         },
-  //         set(newValue) {
-  //           try {
-  //             assert(newValue !== undefined, 'setting undefined');
-  //             value = f.associatedType.from(newValue);
-  //           } catch (e) {
-  //             throw new Error(`{\`${f} = ${newValue}\`: ${e}}`);
-  //           }
-  //         }
-  //       });
-  //     });
-  //     // Don't allow any other properties to be set
-  //     Object.seal(this);
-  //     return this;
-  //   }
-  //   throw new Error('unimplemented');
-  // },
   toBytesSink(sink) {
     const serializer = new BinarySerializer(sink);
     const fields = this.fieldKeys();
@@ -97,13 +57,6 @@ const STObject = makeClass({
       if (!field.isSerialized) {
         return;
       }
-      // const haveValue = value !== undefined;
-      // if (!haveValue) {
-      //   // if (this.format /* && field optional for format */) {
-      //     // return;
-      //   // }
-      //   throw new Error(`${field} value: ${value} can't serialize`);
-      // }
       serializer.writeFieldAndValue(field, value);
     });
   }

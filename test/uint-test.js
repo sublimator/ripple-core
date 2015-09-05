@@ -19,6 +19,10 @@ function compareToTests() {
   check('UInt64.from(124).compareTo(UInt8.from(124))', 0);
   check('UInt64.from(124).compareTo(UInt8.from(123))', 1);
   check('UInt8.from(124).compareTo(UInt8.from(13))', 1);
+  check('UInt8.from(124).compareTo(124)', 0);
+  check('UInt64.from(124).compareTo(124)', 0);
+  check('UInt64.from(124).compareTo(123)', 1);
+  check('UInt8.from(124).compareTo(13)', 1);
 }
 
 describe('Uint*', function() {

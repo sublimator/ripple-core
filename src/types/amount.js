@@ -5,6 +5,7 @@ const assert = require('assert');
 const BN = require('bn.js');
 const Decimal = require('decimal.js');
 const makeClass = require('../make-class');
+const {SerializedType} = require('./serialized-type');
 const {bytesToHex} = require('../bytes-utils');
 const {Currency} = require('./currency');
 const {AccountID} = require('./account-id');
@@ -38,6 +39,7 @@ const Amount = makeClass({
     this.currency = currency || Currency.XRP;
     this.issuer = issuer || null;
   },
+  mixin: SerializedType,
   static: {
     from(value) {
       if (value instanceof this) {
@@ -47,7 +49,7 @@ const Amount = makeClass({
       if (parser) {
         return new this(...parser(value));
       }
-      throw new Error('unimplemented');
+      throw new Error(`unsupported value: ${value}`);
     },
     fromParser(parser) {
       const mantissa = parser.read(8);

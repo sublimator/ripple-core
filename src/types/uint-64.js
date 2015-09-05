@@ -19,7 +19,7 @@ const UInt64 = makeClass({
       this._bytes.set(serializeUIntN(arg, 4), 4);
     } else if (arg instanceof BN) {
       this._bytes = parseBytes(arg.toArray('be', 8), Uint8Array);
-      this._numeric = arg;
+      this._toBN = arg;
     } else {
       if (argType === 'string') {
         if (!HEX_REGEX.test(arg)) {
@@ -33,8 +33,11 @@ const UInt64 = makeClass({
   toJSON() {
     return bytesToHex(this._bytes);
   },
+  valueOf() {
+    return this.toBN();
+  },
   cached: {
-    numeric() {
+    toBN() {
       return new BN(this._bytes);
     }
   },

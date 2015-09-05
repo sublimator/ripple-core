@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const assert = require('assert');
 const coreTypes = require('../src/types');
+const {SerializedType} = require('../src/types/serialized-type');
 
 describe('SerializedType interfaces', function() {
   _.forOwn(coreTypes, (Value, name) => {
@@ -27,6 +28,13 @@ describe('SerializedType interfaces', function() {
     it(`${name}.from(json).toJSON() == json`, function() {
       const newJSON = new Value().toJSON();
       assert.deepEqual(Value.from(newJSON).toJSON(), newJSON);
+    });
+    describe('supports all methods of the SerializedType mixin', function() {
+      _.keys(SerializedType).forEach(k => {
+        it(`new ${name}()['${k}'] !== undefined`, () => {
+          assert.notEqual(new Value()[k], undefined);
+        });
+      });
     });
   });
 });

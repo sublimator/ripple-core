@@ -1,5 +1,49 @@
 'use strict';
 
+const {bytesToHex, slice} = require('../bytes-utils.js');
+const {BytesList} = require('../binary-serializer.js');
+
+const Comparable = {
+  lt(other) {
+    return this.compareTo(other) < 0;
+  },
+  eq(other) {
+    return this.compareTo(other) === 0;
+  },
+  gt(other) {
+    return this.compareTo(other) > 0;
+  },
+  gte(other) {
+    return this.compareTo(other) > -1;
+  },
+  lte(other) {
+    return this.compareTo(other) < 1;
+  }
+};
+
+const SerializedType = {
+  toBytesSink(sink) {
+    sink.put(this._bytes);
+  },
+  toHex() {
+    return bytesToHex(this.toBytes());
+  },
+  toBytes() {
+    if (this._bytes) {
+      return slice(this._bytes);
+    }
+    const bl = new BytesList();
+    this.toBytesSink(bl);
+    return bl.toBytes();
+  },
+  toJSON() {
+    return this.toHex();
+  },
+  toString() {
+    return this.toHex();
+  }
+};
+
 function ensureArrayLike(Type, Child, arrayLike) {
   if (arrayLike instanceof Type) {
     return arrayLike;
@@ -13,5 +57,7 @@ function ensureArrayLike(Type, Child, arrayLike) {
 }
 
 module.exports = {
-  ensureArrayLike
+  ensureArrayLike,
+  SerializedType,
+  Comparable
 };

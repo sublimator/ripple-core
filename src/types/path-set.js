@@ -3,7 +3,7 @@
 
 const _ = require('lodash');
 const makeClass = require('../make-class');
-const {ensureArrayLike} = require('./serialized-type');
+const {SerializedType, ensureArrayLike} = require('./serialized-type');
 const {Currency} = require('./currency');
 const {AccountID} = require('./account-id');
 
@@ -69,6 +69,7 @@ const Path = makeClass({
 });
 
 const PathSet = makeClass({
+  mixin: SerializedType,
   extends: Array,
   static: {
     from(value) {

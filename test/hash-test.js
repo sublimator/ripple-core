@@ -15,8 +15,8 @@ describe('Hash160', function() {
     const h1 = Hash160.from('1000000000000000000000000000000000000000');
     const h2 = Hash160.from('2000000000000000000000000000000000000000');
     const h3 = Hash160.from('0000000000000000000000000000000000000003');
-    assert(h1.lessThan(h2));
-    assert(h3.lessThan(h2));
+    assert(h1.lt(h2));
+    assert(h3.lt(h2));
   });
 });
 

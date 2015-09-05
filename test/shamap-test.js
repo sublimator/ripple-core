@@ -51,10 +51,10 @@ describe('ShaMap', () => {
     ];
     items.forEach(i => map.addItem(...makeItem(i)));
     const h1 = map.hash();
-    assert(h1.equalTo(h1));
+    assert(h1.eq(h1));
     map = new ShaMap();
     items.reverse().forEach(i => map.addItem(...makeItem(i)));
-    assert(map.hash().equalTo(h1));
+    assert(map.hash().eq(h1));
   });
   function factory(fixture) {
     it(`recreate account state hash from ${fixture}`, () => {
