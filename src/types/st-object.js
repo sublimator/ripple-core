@@ -2,9 +2,9 @@
 
 // const assert = require('assert');
 const _ = require('lodash');
-const makeClass = require('../make-class');
+const makeClass = require('../utils/make-class');
 const {Field} = require('../enums');
-const {BinarySerializer} = require('../binary-serializer');
+const {BinarySerializer} = require('../serdes/binary-serializer');
 const {ObjectEndMarker} = Field;
 const {SerializedType} = require('./serialized-type');
 

@@ -1,7 +1,7 @@
 'use strict';
 
-const makeClass = require('../make-class');
-const {parseBytes, bytesToHex} = require('../bytes-utils');
+const makeClass = require('../utils/make-class');
+const {parseBytes, bytesToHex} = require('../utils/bytes-utils');
 const {SerializedType} = require('./serialized-type');
 
 const Blob = makeClass({

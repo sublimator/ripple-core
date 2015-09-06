@@ -1,9 +1,9 @@
 'use strict';
 
 const assert = require('assert');
-const makeClass = require('../make-class');
+const makeClass = require('../utils/make-class');
 const {Comparable, SerializedType} = require('./serialized-type');
-const {compareBytes, parseBytes} = require('../bytes-utils');
+const {compareBytes, parseBytes} = require('../utils/bytes-utils');
 
 const Hash = makeClass({
   Hash(bytes) {

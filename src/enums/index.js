@@ -2,9 +2,9 @@
 
 const assert = require('assert');
 const _ = require('lodash');
-const {parseBytes, serializeUIntN} = require('./bytes-utils');
-const makeClass = require('./make-class');
-const enums = require('./enum-definitions.json');
+const {parseBytes, serializeUIntN} = require('./../utils/bytes-utils');
+const makeClass = require('./../utils/make-class');
+const enums = require('./definitions.json');
 
 function transformWith(func, obj) {
   return _.transform(obj, func);

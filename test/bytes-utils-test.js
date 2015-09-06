@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const bytesUtils = require('../src/bytes-utils');
+const bytesUtils = require('../src/utils/bytes-utils');
 const {slice, compareBytes, parseBytes, bytesToHex} = bytesUtils;
 
 describe('bytes-utils', function() {

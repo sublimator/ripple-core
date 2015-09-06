@@ -1,6 +1,6 @@
 'use strict';
 
-const makeClass = require('../make-class');
+const makeClass = require('../utils/make-class');
 const {UInt} = require('./uint');
 
 const UInt32 = makeClass({

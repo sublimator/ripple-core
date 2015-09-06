@@ -2,9 +2,9 @@
 
 const assert = require('assert');
 const BN = require('bn.js');
-const makeClass = require('../make-class');
+const makeClass = require('../utils/make-class');
 const {Comparable, SerializedType} = require('./serialized-type');
-const {serializeUIntN} = require('../bytes-utils');
+const {serializeUIntN} = require('../utils/bytes-utils');
 const MAX_VALUES = [0, 255, 65535, 16777215, 4294967295];
 
 function signum(a, b) {

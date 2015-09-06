@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-expressions */
 
 const _ = require('lodash');
-const makeClass = require('../make-class');
+const makeClass = require('../utils/make-class');
 const {SerializedType, ensureArrayLikeIs} = require('./serialized-type');
 const {Currency} = require('./currency');
 const {AccountID} = require('./account-id');

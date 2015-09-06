@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require('assert');
-const makeClass = require('./make-class');
-const {BytesSink} = require('./binary-serializer');
+const makeClass = require('./utils/make-class');
+const {BytesSink} = require('./serdes/binary-serializer');
 const {Hash256} = require('./types');
 const {HashPrefix} = require('./hash-prefixes');
 

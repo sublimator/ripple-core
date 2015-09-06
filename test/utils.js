@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const Decimal = require('decimal.js');
-const {parseBytes} = require('../src/bytes-utils');
+const {parseBytes} = require('../src/utils/bytes-utils');
 
 function hexOnly(hex) {
   return hex.replace(/[^a-fA-F0-9]/g, '');

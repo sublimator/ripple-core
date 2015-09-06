@@ -1,9 +1,9 @@
 'use strict';
 
 const assert = require('assert');
-const {parseBytes, bytesToHex} = require('./bytes-utils');
-const makeClass = require('./make-class');
-const {Type, Field} = require('./enums');
+const {parseBytes, bytesToHex} = require('../utils/bytes-utils');
+const makeClass = require('../utils/make-class');
+const {Type, Field} = require('../enums');
 
 const BytesSink = {
   put(/* bytesSequence */) {
@@ -12,7 +12,7 @@ const BytesSink = {
 };
 
 const BytesList = makeClass({
-  implements: BytesSink,
+  implementing: BytesSink,
   BytesList() {
     this.arrays = [];
     this.length = 0;

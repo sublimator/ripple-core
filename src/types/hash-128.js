@@ -1,6 +1,6 @@
 'use strict';
 
-const makeClass = require('../make-class');
+const makeClass = require('../utils/make-class');
 const {Hash} = require('./hash');
 
 const Hash128 = makeClass({

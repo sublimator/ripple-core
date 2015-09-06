@@ -5,9 +5,8 @@
 const BN = require('bn.js');
 const assert = require('assert-diff');
 const lib = require('../src');
-const {binary: {makeParser}} = lib;
+const {binary: {makeParser, BytesList, BinarySerializer}} = lib;
 const {UInt8, UInt16, UInt32, UInt64, STObject} = lib;
-const {BytesList, BinarySerializer} = require('../src/binary-serializer');
 const {loadFixture} = require('./utils');
 const fixtures = loadFixture('data-driven-tests.json');
 

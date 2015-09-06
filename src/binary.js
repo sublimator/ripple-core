@@ -4,9 +4,9 @@
 
 const hashjs = require('hash.js');
 const types = require('./types');
-const {BinaryParser} = require('./binary-parser');
-const {BinarySerializer, BytesList} = require('./binary-serializer');
-const {bytesToHex, slice, parseBytes} = require('./bytes-utils');
+const {BinaryParser} = require('./serdes/binary-parser');
+const {BinarySerializer, BytesList} = require('./serdes/binary-serializer');
+const {bytesToHex, slice, parseBytes} = require('./utils/bytes-utils');
 
 const makeParser = bytes => new BinaryParser(bytes);
 const readJSON = parser => parser.readType(types.STObject).toJSON();

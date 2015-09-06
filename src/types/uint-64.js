@@ -2,8 +2,8 @@
 
 const assert = require('assert');
 const BN = require('bn.js');
-const makeClass = require('../make-class');
-const {bytesToHex, parseBytes, serializeUIntN} = require('../bytes-utils');
+const makeClass = require('../utils/make-class');
+const {bytesToHex, parseBytes, serializeUIntN} = require('../utils/bytes-utils');
 const {UInt} = require('./uint');
 
 const HEX_REGEX = /^[A-F0-9]{16}$/;

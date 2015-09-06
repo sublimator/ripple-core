@@ -1,6 +1,6 @@
 'use strict';
 
-const {serializeUIntN} = require('./bytes-utils');
+const {serializeUIntN} = require('./utils/bytes-utils');
 
 function bytes(uint32) {
   return serializeUIntN(uint32, 4);

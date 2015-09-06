@@ -1,9 +1,9 @@
 'use strict';
 
 const assert = require('assert');
-const makeClass = require('./make-class');
-const {Field} = require('./enums');
-const {slice, parseBytes} = require('./bytes-utils');
+const makeClass = require('../utils/make-class');
+const {Field} = require('../enums');
+const {slice, parseBytes} = require('../utils/bytes-utils');
 
 const BinaryParser = makeClass({
   BinaryParser(buf) {

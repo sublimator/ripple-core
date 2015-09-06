@@ -11,9 +11,9 @@ const {binary: {makeParser, readJSON}, Field, Amount, Hash160} = coreTypes;
 const {enums: {TransactionType}} = coreTypes;
 const utils = require('./utils');
 const {parseHexOnly, assertEqualAmountJSON, hexOnly, loadFixture} = utils;
-const {bytesToHex} = require('../src/bytes-utils');
+const {bytesToHex} = require('../src/utils/bytes-utils');
 const fixtures = loadFixture('data-driven-tests.json');
-const {BytesList} = require('../src/binary-serializer');
+const {BytesList} = require('../src/serdes/binary-serializer');
 
 const __ = hexOnly;
 function unused() {}

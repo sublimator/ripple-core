@@ -1,7 +1,7 @@
 'use strict';
 
-const {bytesToHex, slice} = require('../bytes-utils.js');
-const {BytesList} = require('../binary-serializer.js');
+const {bytesToHex, slice} = require('../utils/bytes-utils');
+const {BytesList} = require('../serdes/binary-serializer');
 
 const Comparable = {
   lt(other) {
