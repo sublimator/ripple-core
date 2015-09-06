@@ -2,7 +2,7 @@
 
 const makeClass = require('../make-class');
 const {Hash256} = require('./hash-256');
-const {ensureArrayLike, SerializedType} = require('./serialized-type');
+const {ensureArrayLikeIs, SerializedType} = require('./serialized-type');
 
 const Vector256 = makeClass({
   mixin: SerializedType,
@@ -18,7 +18,7 @@ const Vector256 = makeClass({
       return vector256;
     },
     from(value) {
-      return ensureArrayLike(this, Hash256, value);
+      return ensureArrayLikeIs(Vector256, value).withChildren(Hash256);
     }
   },
   toBytesSink(sink) {

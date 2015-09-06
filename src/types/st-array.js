@@ -1,7 +1,7 @@
 'use strict';
 
 const makeClass = require('../make-class');
-const {ensureArrayLike, SerializedType} = require('./serialized-type');
+const {ensureArrayLikeIs, SerializedType} = require('./serialized-type');
 const {Field} = require('../enums');
 const {STObject} = require('./st-object');
 const {ArrayEndMarker} = Field;
@@ -24,7 +24,7 @@ const STArray = makeClass({
       return array;
     },
     from(value) {
-      return ensureArrayLike(this, STObject, value);
+      return ensureArrayLikeIs(STArray, value).withChildren(STObject);
     }
   },
   toJSON() {

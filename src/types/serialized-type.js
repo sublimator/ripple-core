@@ -44,20 +44,23 @@ const SerializedType = {
   }
 };
 
-function ensureArrayLike(Type, Child, arrayLike) {
-  if (arrayLike instanceof Type) {
-    return arrayLike;
-  }
-
-  const obj = new Type();
-  for (let i = 0; i < arrayLike.length; i++) {
-    obj.push(Child.from(arrayLike[i]));
-  }
-  return obj;
+function ensureArrayLikeIs(Type, arrayLike) {
+  return {
+    withChildren(Child) {
+      if (arrayLike instanceof Type) {
+        return arrayLike;
+      }
+      const obj = new Type();
+      for (let i = 0; i < arrayLike.length; i++) {
+        obj.push(Child.from(arrayLike[i]));
+      }
+      return obj;
+    }
+  };
 }
 
 module.exports = {
-  ensureArrayLike,
+  ensureArrayLikeIs,
   SerializedType,
   Comparable
 };

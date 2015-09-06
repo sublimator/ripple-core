@@ -341,7 +341,7 @@ function parseLedger4320278() {
   ripple.Amount.strict_mode = false;
   ripple = false;
 
-  it(`can parse object`, (done) => {
+  it(`can parse object`, () => {
     this.timeout(30e3);
     const json = loadFixture('as-ledger-4320278.json');
 
@@ -356,12 +356,6 @@ function parseLedger4320278() {
         console.log('error', i, !ripple && error);
       }
     });
-
-    const {AccountID} = coreTypes;
-    console.log('cacheSize', Object.keys(coreTypes.AccountID.cache).length);
-    console.log('cacheHits', AccountID.cacheHits);
-    console.log('cacheMisses', AccountID.cacheMisses);
-    done();
   });
 }
 
