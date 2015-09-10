@@ -30,7 +30,7 @@
     "istanbul": "~0.3.19",
     "mocha": "^2.3.0",
     "node-inspector": "^0.12.3",
-    "ripple-keypairs": "^0.8.0",
+    "@niq/ripple-keypairs": "^0.9.1",
     "ripple-lib": "^0.12.6",
     "sequelize": "^3.7.1",
     "sqlite3": "^3.0.10",

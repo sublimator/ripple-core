@@ -48,11 +48,11 @@ const STObject = makeClass({
       result[key] = value && value.toJSON ? value.toJSON() : value;
     });
   },
-  toBytesSink(sink) {
+  toBytesSink(sink, filter=() => true) {
     const serializer = new BinarySerializer(sink);
     const fields = this.fieldKeys();
     const sorted = _.sortBy(fields, 'ordinal');
-    sorted.forEach((field) => {
+    sorted.filter(filter).forEach((field) => {
       const value = this[field];
       if (!field.isSerialized) {
         return;

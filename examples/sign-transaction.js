@@ -5,8 +5,8 @@
 
 const path = require('path');
 const {STObject, binary, HashPrefix} = require('../src');
-const {serializeObject, bytesToHex, sha512Half} = binary;
-const {keyPairFromSeed} = require('ripple-keypairs');
+const {serializeObject, bytesToHex, signingData, sha512Half} = binary;
+const {keyPairFromSeed} = require('@niq/ripple-keypairs');
 
 const EXAMPLE = {
   secret: 'sEd7t79mzn2dwy3vvpvRmaaLbLhvme6',
@@ -23,15 +23,13 @@ const EXAMPLE = {
 
 const toHex = v => bytesToHex(v);
 const prettyJSON = obj => JSON.stringify(obj, undefined, 2);
-const signingData = tx => serializeObject(tx, HashPrefix.transactionSig);
-
 function signTxJson(secret, tx_json) {
   const keyPair = keyPairFromSeed(secret);
   // While we could just work directly off tx_json (try it) we create an
   // STObject, so that many of the values are parsed only once.
   const tx = STObject.from(tx_json);
 
-  tx.SigningPubKey = toHex(keyPair.pubKeyCanonicalBytes());
+  tx.SigningPubKey = toHex(keyPair.publicBytes());
   tx.TxnSignature = toHex(keyPair.sign(signingData(tx)));
 
   const serialized = serializeObject(tx);
