@@ -772,21 +772,14 @@
         },
         {
             "type_name": "STArray",
-            "name": "SigningAccounts",
-            "nth_of_type": 2,
-            "type": 15,
-            "expected_hex": "F2"
-        },
-        {
-            "type_name": "STArray",
-            "name": "TxnSignatures",
+            "name": "Signers",
             "nth_of_type": 3,
             "type": 15,
             "expected_hex": "F3"
         },
         {
             "type_name": "STArray",
-            "name": "Signatures",
+            "name": "SignerEntries",
             "nth_of_type": 4,
             "type": 15,
             "expected_hex": "F4"

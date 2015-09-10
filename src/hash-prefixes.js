@@ -18,6 +18,8 @@ const HashPrefix = {
   ledgerMaster: bytes(0x4C575200),
   // inner transaction to sign
   transactionSig: bytes(0x53545800),
+  // inner transaction to sign
+  transactionMultiSig: bytes(0x534D5400),
   // validation for signing
   validation: bytes(0x56414C00),
   // proposal for signing

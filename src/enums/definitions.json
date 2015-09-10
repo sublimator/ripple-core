@@ -25,6 +25,7 @@
     "Ticket": 84,
     "LedgerHashes": 104,
     "EnabledAmendments": 102,
+    "SignerList": 83,
     "Offer": 111,
     "AccountRoot": 97,
     "RippleState": 114,
@@ -74,6 +75,17 @@
         "nth": 2,
         "isVLEncoded": false,
         "bytes": "12",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt16"
+      }
+    ],
+    [
+      "SignerWeight",
+      {
+        "nth": 3,
+        "isVLEncoded": false,
+        "bytes": "13",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt16"
@@ -426,6 +438,17 @@
         "nth": 34,
         "isVLEncoded": false,
         "bytes": "2022",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "SignerQuorum",
+      {
+        "nth": 35,
+        "isVLEncoded": false,
+        "bytes": "2023",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -1191,6 +1214,28 @@
       }
     ],
     [
+      "SignerEntry",
+      {
+        "nth": 11,
+        "isVLEncoded": false,
+        "bytes": "EB",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "Signer",
+      {
+        "nth": 16,
+        "isVLEncoded": false,
+        "bytes": "E010",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "ArrayEndMarker",
       {
         "nth": 1,
@@ -1202,29 +1247,18 @@
       }
     ],
     [
-      "SigningAccounts",
-      {
-        "nth": 2,
-        "isVLEncoded": false,
-        "bytes": "F2",
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STArray"
-      }
-    ],
-    [
-      "TxnSignatures",
+      "Signers",
       {
         "nth": 3,
         "isVLEncoded": false,
         "bytes": "F3",
         "isSerialized": true,
-        "isSigningField": true,
+        "isSigningField": false,
         "type": "STArray"
       }
     ],
     [
-      "Signatures",
+      "SignerEntries",
       {
         "nth": 4,
         "isVLEncoded": false,
@@ -1444,7 +1478,7 @@
       }
     ]
   ],
-  "date-generated": "Fri Aug 28 17:11:15 ICT 2015",
+  "date-generated": "Thu Sep 10 19:12:53 ICT 2015",
   "TRANSACTION_RESULTS": {
     "tecINSUFFICIENT_RESERVE": 141,
     "telNO_DST_PARTIAL": -393,
@@ -1552,6 +1586,7 @@
     "Payment": 0,
     "AccountSet": 3,
     "OfferCreate": 7,
+    "SignerListSet": 12,
     "Contract": 9,
     "Claim": 1,
     "Invalid": -1

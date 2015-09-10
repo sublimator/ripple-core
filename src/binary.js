@@ -11,6 +11,7 @@ const {bytesToHex, slice, parseBytes} = require('./utils/bytes-utils');
 
 const makeParser = bytes => new BinaryParser(bytes);
 const readJSON = parser => parser.readType(types.STObject).toJSON();
+const binaryToJSON = (bytes) => readJSON(makeParser(bytes));
 
 function serializeObject(object, {prefix, signingFieldsOnly = false} = {}) {
   const bytesList = new BytesList();
@@ -28,9 +29,13 @@ function sha512Half(...args) {
   return parseBytes(hash.digest().slice(0, 32), Uint8Array);
 }
 
-function signingData(tx) {
-  return serializeObject(tx, {prefix: HashPrefix.transactionSig,
-                              signingFieldsOnly: true});
+function signingData(tx, prefix = HashPrefix.transactionSig) {
+  return serializeObject(tx, {prefix, signingFieldsOnly: true});
+}
+
+function multiSigningData(tx) {
+  return serializeObject(tx, {
+    prefix: HashPrefix.transactionMultiSig, signingFieldsOnly: true});
 }
 
 module.exports = {
@@ -42,7 +47,9 @@ module.exports = {
   readJSON,
   bytesToHex,
   parseBytes,
+  multiSigningData,
   signingData,
+  binaryToJSON,
   sha512Half,
   slice
 };
