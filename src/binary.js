@@ -34,8 +34,11 @@ function signingData(tx, prefix = HashPrefix.transactionSig) {
 }
 
 function multiSigningData(tx) {
-  return serializeObject(tx, {
-    prefix: HashPrefix.transactionMultiSig, signingFieldsOnly: true});
+  return signingData(tx, HashPrefix.transactionMultiSig);
+}
+
+function transactionID(serialized) {
+  return sha512Half(HashPrefix.transactionID, serialized);
 }
 
 module.exports = {
@@ -51,5 +54,6 @@ module.exports = {
   signingData,
   binaryToJSON,
   sha512Half,
+  transactionID,
   slice
 };

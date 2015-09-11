@@ -4,8 +4,8 @@
 'use strict';
 
 const path = require('path');
-const {STObject, binary, HashPrefix} = require('../src');
-const {serializeObject, bytesToHex, signingData, sha512Half} = binary;
+const {STObject, binary} = require('../src');
+const {transactionID, serializeObject, bytesToHex, signingData} = binary;
 const {keyPairFromSeed} = require('@niq/ripple-keypairs');
 
 const EXAMPLE = {
@@ -33,7 +33,7 @@ function signTxJson(secret, tx_json) {
   tx.TxnSignature = toHex(keyPair.sign(signingData(tx)));
 
   const serialized = serializeObject(tx);
-  const hash = toHex(sha512Half(HashPrefix.transactionID, serialized));
+  const hash = toHex(transactionID(serialized));
   const tx_blob = toHex(serialized);
 
   return {
@@ -44,7 +44,7 @@ function signTxJson(secret, tx_json) {
   };
 }
 
-(function main(args = process.argv) {
+function main(args = process.argv) {
   const [, script, secret, tx_json] = args;
   if (args.length < 4) {
     const relative = path.relative(process.cwd(), script);
@@ -54,4 +54,9 @@ function signTxJson(secret, tx_json) {
     const bundle = signTxJson(secret, JSON.parse(tx_json));
     console.log(prettyJSON(bundle));
   }
-}());
+}
+
+module.exports = main;
+if (require.main === module) {
+  main();
+}

@@ -1,11 +1,38 @@
 'use strict';
 
+const intercept = require('intercept-stdout');
+const fs = require('fs');
+const fsExtra = require('fs-extra');
 const assert = require('assert');
 const Decimal = require('decimal.js');
 const {parseBytes} = require('../src/utils/bytes-utils');
 
 function hexOnly(hex) {
   return hex.replace(/[^a-fA-F0-9]/g, '');
+}
+
+function unused() {}
+
+function captureLogs(func, done) {
+  let log = '';
+  const unhook = intercept(txt => {
+    log += txt;
+    return '';
+  });
+  let err;
+  try {
+    func();
+  } catch (e) {
+    err = e;
+  }
+  unhook();
+  if (err) {
+    throw err;
+  }
+  if (typeof done === 'function') {
+    return done(log);
+  }
+  return log;
 }
 
 function parseHexOnly(hex, to) {
@@ -15,6 +42,28 @@ function parseHexOnly(hex, to) {
 function loadFixture(relativePath) {
   const fn = __dirname + '/fixtures/' + relativePath;
   return require(fn);
+}
+
+function isBufferOrString(val) {
+  return Buffer.isBuffer(val) || (typeof val === 'string');
+}
+
+function loadFixtureText(relativePath) {
+  const fn = __dirname + '/fixtures/' + relativePath;
+  return fs.readFileSync(fn).toString('utf8');
+}
+
+function fixturePath(relativePath) {
+  return __dirname + '/fixtures/' + relativePath;
+}
+
+function prettyJSON(val) {
+  return JSON.stringify(val, null, 2);
+}
+
+function writeFixture(relativePath, data) {
+  const out = isBufferOrString(data) ? data : prettyJSON(data);
+  return fsExtra.outputFileSync(fixturePath(relativePath), out);
 }
 
 function assertEqualAmountJSON(actual, expected) {
@@ -35,5 +84,9 @@ module.exports = {
   hexOnly,
   parseHexOnly,
   loadFixture,
-  assertEqualAmountJSON
+  loadFixtureText,
+  assertEqualAmountJSON,
+  writeFixture,
+  unused,
+  captureLogs
 };

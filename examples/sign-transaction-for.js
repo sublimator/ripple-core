@@ -4,9 +4,9 @@
 'use strict';
 
 const path = require('path');
-const {AccountID, STObject, binary, HashPrefix} = require('../src');
-const {serializeObject, binaryToJSON, bytesToHex,
-       multiSigningData, sha512Half} = binary;
+const {AccountID, STObject, binary} = require('../src');
+const {serializeObject, binaryToJSON, bytesToHex, multiSigningData,
+       transactionID} = binary;
 const {keyPairFromSeed, seedFromPhrase} = require('@niq/ripple-keypairs');
 
 const EXAMPLE = {
@@ -51,7 +51,7 @@ function signTxJson(tx_json, secret, signingAccount = null) {
   tx.SigningPubKey = '';
 
   const serialized = serializeObject(tx);
-  const hash = toHex(sha512Half(HashPrefix.transactionID, serialized));
+  const hash = toHex(transactionID(serialized));
   const tx_blob = toHex(serialized);
 
   return {
@@ -61,7 +61,7 @@ function signTxJson(tx_json, secret, signingAccount = null) {
   };
 }
 
-(function main(args = process.argv) {
+function main(args = process.argv) {
   const [, script, secret, tx_json, signingAccount] = args;
   const relative = path.relative(process.cwd(), script);
   if (args.length < 4) {
@@ -72,4 +72,9 @@ function signTxJson(tx_json, secret, signingAccount = null) {
     console.log(prettyJSON(bundle));
     console.error(`${relative} nextSigner '${JSON.stringify(bundle.tx_json)}'`);
   }
-}());
+}
+
+module.exports = main;
+if (require.main === module) {
+  main();
+}
