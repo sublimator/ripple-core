@@ -1478,7 +1478,7 @@
       }
     ]
   ],
-  "date-generated": "Thu Sep 10 19:12:53 ICT 2015",
+  "date-generated": "Fri Sep 11 11:35:38 ICT 2015",
   "TRANSACTION_RESULTS": {
     "tecINSUFFICIENT_RESERVE": 141,
     "telNO_DST_PARTIAL": -393,
@@ -1505,7 +1505,7 @@
     "terOWNERS": -93,
     "tecNO_REGULAR_KEY": 131,
     "tecINSUFF_FEE": 136,
-    "tecMASTER_DISABLED": 130,
+    "tecNO_ALTERNATIVE_KEY": 130,
     "tecNO_ENTRY": 140,
     "terLAST": -91,
     "terNO_RIPPLE": -90,
@@ -1513,6 +1513,7 @@
     "tecNEED_MASTER_KEY": 142,
     "temBAD_FEE": -294,
     "terPRE_SEQ": -92,
+    "tecOVERSIZE": 145,
     "tefMASTER_DISABLED": -187,
     "temBAD_CURRENCY": -296,
     "tefDST_TAG_NEEDED": -193,

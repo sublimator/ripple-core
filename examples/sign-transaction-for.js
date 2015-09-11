@@ -62,13 +62,13 @@ function signTxJson(tx_json, secret, signingAccount = null) {
 }
 
 (function main(args = process.argv) {
-  const [, script, secret, tx_json] = args;
+  const [, script, secret, tx_json, signingAccount] = args;
   const relative = path.relative(process.cwd(), script);
   if (args.length < 4) {
     console.error(`Usage: ${relative} <secret> <tx_json> [signing_account]`);
     console.error(`\ne.g: ${relative} ${EXAMPLE.secret} '${EXAMPLE.tx_json}'`);
   } else {
-    const bundle = signTxJson(JSON.parse(tx_json), secret);
+    const bundle = signTxJson(JSON.parse(tx_json), secret, signingAccount);
     console.log(prettyJSON(bundle));
     console.error(`${relative} nextSigner '${JSON.stringify(bundle.tx_json)}'`);
   }
