@@ -98,7 +98,7 @@ function getArgs() {
   .argv;
 }
 
-(function main(argv = getArgs()) {
+function main(argv = getArgs()) {
   const {Transaction} = initDB(argv.db);
   const query = makeQuery(argv);
   Transaction.findAll(query).then(function(txns) {
@@ -108,5 +108,13 @@ function getArgs() {
     console.log(prettyJSON(txns));
     // support script.js $argv > dump.json
     console.error({query, count: txns.length});
+    if (_.isFunction(argv.done)) {
+      argv.done();
+    }
   });
-}());
+}
+
+module.exports = main;
+if (require.main === module) {
+  main();
+}

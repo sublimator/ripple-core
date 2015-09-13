@@ -1,13 +1,19 @@
 'use strict';
 
 const assert = require('assert');
-const {unused, captureLogs, writeFixture, loadFixtureText} = require('./utils');
+const {
+  unused,
+  captureLogs,
+  captureLogsAsync,
+  writeFixture,
+  loadFixtureText
+} = require('./utils');
 
 unused(writeFixture);
 
 describe('Examples', function() {
   describe('sign-transaction-for.js', function() {
-    it('can', function() {
+    it('a', function() {
       const main = require('../examples/sign-transaction-for');
       const secret = 'dan';
       const tx_json =
@@ -59,7 +65,7 @@ describe('Examples', function() {
     });
   });
   describe('sign-transaction.js', function() {
-    it('can', function() {
+    it('a', function() {
       const main = require('../examples/sign-transaction');
       const secret = 'sEd7t79mzn2dwy3vvpvRmaaLbLhvme6';
       const tx_json = {
@@ -81,6 +87,24 @@ describe('Examples', function() {
       const fn = 'examples/sign-transaction/a.txt';
       // writeFixture(fn, log);
       assert.equal(log, loadFixtureText(fn));
+    });
+  });
+  describe('transaction.db.js', function() {
+    it('a', function(done) {
+      const fn = 'examples/transaction.db/a.txt';
+      const main = require('../examples/transaction.db');
+      // main takes an option as parsed by yargs
+      const getLogs = captureLogsAsync();
+      main({
+        recycle_test: true,
+        db: __dirname + '/fixtures/account-tx-transactions.db',
+        done() {
+          const log = getLogs();
+          writeFixture(fn, log);
+          assert.equal(log, loadFixtureText(fn));
+          done();
+        }
+      });
     });
   });
 });

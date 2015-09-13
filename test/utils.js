@@ -13,26 +13,28 @@ function hexOnly(hex) {
 
 function unused() {}
 
-function captureLogs(func, done) {
+function captureLogsAsync() {
   let log = '';
   const unhook = intercept(txt => {
     log += txt;
     return '';
   });
-  let err;
+  return function() {
+    unhook();
+    return log;
+  };
+}
+
+function captureLogs(func) {
+  const finished = captureLogsAsync();
   try {
     func();
   } catch (e) {
-    err = e;
+    const log = finished();
+    console.error(log);
+    throw e;
   }
-  unhook();
-  if (err) {
-    throw err;
-  }
-  if (typeof done === 'function') {
-    return done(log);
-  }
-  return log;
+  return finished();
 }
 
 function parseHexOnly(hex, to) {
@@ -88,5 +90,6 @@ module.exports = {
   assertEqualAmountJSON,
   writeFixture,
   unused,
-  captureLogs
+  captureLogs,
+  captureLogsAsync
 };
