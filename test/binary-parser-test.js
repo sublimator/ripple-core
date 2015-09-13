@@ -352,7 +352,7 @@ function parseLedger4320278() {
       // const actual = new ripple.SerializedObject(e.binary).to_json();
       try {
         assert.deepEqual(actual, expected);
-      } catch(error) {
+      } catch (error) {
         console.log('error', i, !ripple && error);
       }
     });
