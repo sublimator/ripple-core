@@ -61,7 +61,9 @@ describe('Examples', function() {
         JSON.stringify(tx_json)
       ];
       const log = captureLogs(() => main(args));
-      assert.equal(log, loadFixtureText('examples/sign-transaction-for/a.txt'));
+      const fn = 'examples/sign-transaction-for/a.txt';
+      // writeFixture(fn, log);
+      assert.equal(log, loadFixtureText(fn));
     });
   });
   describe('sign-transaction.js', function() {
