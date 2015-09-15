@@ -102,7 +102,6 @@ describe('Examples', function() {
         db: __dirname + '/fixtures/account-tx-transactions.db',
         done() {
           const log = getLogs();
-          writeFixture(fn, log);
           assert.equal(log, loadFixtureText(fn));
           done();
         }

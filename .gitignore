@@ -73,3 +73,7 @@ test/fixtures/as-ledger-4320278.json
 # Huge ledger dumps
 test/fixtures/14280680.json
 test/fixtures/ledger-4320277.json
+
+# sqlite journaling files
+*.db-shm
+*.db-wal
