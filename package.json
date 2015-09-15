@@ -39,7 +39,7 @@
     "yargs": "^3.24.0"
   },
   "scripts": {
-    "compile": "babel --optional runtime -d distrib/npm/ src/",
+    "compile": "babel --optional runtime -d distrib/npm/ src/ && cp src/enums/definitions.json distrib/npm/enums",
     "prepublish": "npm test && npm run lint && npm run compile",
     "test": "istanbul test _mocha",
     "codecov": "cat ./coverage/coverage.json | ./node_modules/codecov.io/bin/codecov.io.js",
