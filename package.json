@@ -1,6 +1,6 @@
 {
   "name": "@niq/ripple-core-types",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ripple core types (json <-> binary)",
   "files": [
     "distrib/npm/*",

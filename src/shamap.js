@@ -2,32 +2,9 @@
 
 const assert = require('assert');
 const makeClass = require('./utils/make-class');
-const {BytesSink} = require('./serdes/binary-serializer');
 const {Hash256} = require('./types');
 const {HashPrefix} = require('./hash-prefixes');
-
-// TODO: this is really slow ?
-const hashjs = require('hash.js');
-
-const Hasher = makeClass({
-  implements: BytesSink,
-  Hasher() {
-    this.hash = hashjs.sha512();
-  },
-  static: {
-    put(bytes) {
-      return new this().put(bytes);
-    }
-  },
-  put(bytes) {
-    this.hash.update(bytes);
-    return this;
-  },
-  finish() {
-    const bytes = this.hash.digest();
-    return new Hash256(bytes.slice(0, 32));
-  }
-});
+const {Sha512Half: Hasher} = require('./hashes');
 
 const ShaMapNode = makeClass({
   virtuals: {

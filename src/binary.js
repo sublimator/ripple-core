@@ -2,12 +2,13 @@
 
 'use strict';
 
-const hashjs = require('hash.js');
 const types = require('./types');
 const {HashPrefix} = require('./hash-prefixes');
 const {BinaryParser} = require('./serdes/binary-parser');
 const {BinarySerializer, BytesList} = require('./serdes/binary-serializer');
 const {bytesToHex, slice, parseBytes} = require('./utils/bytes-utils');
+
+const {sha512Half, transactionID} = require('./hashes');
 
 const makeParser = bytes => new BinaryParser(bytes);
 const readJSON = parser => parser.readType(types.STObject).toJSON();
@@ -27,12 +28,6 @@ function serializeObject(object, opts = {}) {
   return bytesList.toBytes();
 }
 
-function sha512Half(...args) {
-  const hash = hashjs.sha512();
-  args.forEach(a => hash.update(a));
-  return parseBytes(hash.digest().slice(0, 32), Uint8Array);
-}
-
 function signingData(tx, prefix = HashPrefix.transactionSig) {
   return serializeObject(tx, {prefix, signingFieldsOnly: true});
 }
@@ -41,10 +36,6 @@ function multiSigningData(tx, signingAccount) {
   const prefix = HashPrefix.transactionMultiSig;
   const suffix = types.AccountID.from(signingAccount).toBytes();
   return serializeObject(tx, {prefix, suffix, signingFieldsOnly: true});
-}
-
-function transactionID(serialized) {
-  return sha512Half(HashPrefix.transactionID, serialized);
 }
 
 module.exports = {

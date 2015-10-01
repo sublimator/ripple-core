@@ -15,7 +15,7 @@ const HashPrefix = {
   // inner node in tree
   innerNode: bytes(0x4D494E00),
   // ledger master data for signing
-  ledgerMaster: bytes(0x4C575200),
+  ledgerHeader: bytes(0x4C575200),
   // inner transaction to sign
   transactionSig: bytes(0x53545800),
   // inner transaction to sign
