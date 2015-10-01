@@ -1,6 +1,6 @@
 {
   "name": "@niq/ripple-core-types",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ripple core types (json <-> binary)",
   "files": [
     "distrib/npm/*",
@@ -15,6 +15,7 @@
     "babel-runtime": "^5.8.24",
     "bn.js": "^3.1.2",
     "codecov.io": "^0.1.6",
+    "create-hash": "^1.1.2",
     "decimal.js": "^4.0.2",
     "hash.js": "^1.0.3",
     "inherits": "^2.0.1",
