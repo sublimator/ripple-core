@@ -28,6 +28,9 @@ const Hash = makeClass({
   compareTo(other) {
     return compareBytes(this._bytes, this.constructor.from(other)._bytes);
   },
+  toString() {
+    return this.toHex();
+  },
   nibblet(depth) {
     const byte_ix = depth > 0 ? (depth / 2) | 0 : 0;
     let b = this._bytes[byte_ix];
