@@ -4,7 +4,7 @@
 const _ = require('lodash');
 const {AccountID, Blob, STObject} = require('./types');
 const binary = require('./binary');
-const {serializeObject, bytesToHex, multiSigningData,
+const {serializeObject, binaryToJSON, bytesToHex, multiSigningData,
        transactionID, signingData} = binary;
 
 const toHex = v => bytesToHex(v);
@@ -17,9 +17,9 @@ function signFor(tx_json_, keyPair, signingAccount = null) {
   const signature = keyPair.sign(multiSigningData(tx_json, signerID));
   const signer = {
     Signer: {
-      SigningPubKey: Blob.from(keyPair.publicBytes()),
-      TxnSignature: Blob.from(signature),
-      Account: AccountID.from(signerID)
+      SigningPubKey: keyPair.publicBytes(),
+      TxnSignature: signature,
+      Account: signerID
     }
   };
 
@@ -32,7 +32,7 @@ function signFor(tx_json_, keyPair, signingAccount = null) {
   const tx_blob = toHex(serialized);
 
   return {
-    tx_json: STObject.from(tx_json).toJSON(),
+    tx_json: binaryToJSON(serialized),
     tx_blob,
     hash
   };
@@ -49,7 +49,7 @@ function sign(tx_json, keyPair) {
   const tx_blob = toHex(serialized);
 
   return {
-    tx_json: tx.toJSON(),
+    tx_json: binaryToJSON(serialized),
     tx_blob,
     hash
   };
