@@ -9,20 +9,9 @@ const {AccountID} = require('./account-id');
 
 const PATHSET_END_BYTE = 0x00;
 const PATH_SEPARATOR_BYTE = 0xFF;
-
-const TYPE = {
-  account: 0x01,
-  currency: 0x10,
-  issuer: 0x20
-};
-
-const HOP_PROPERTIES = _.keys(TYPE);
-
-const TYPES = {
-  issuer: AccountID,
-  account: AccountID,
-  currency: Currency
-};
+const TYPE_ACCOUNT = 0x01;
+const TYPE_CURRENCY = 0x10;
+const TYPE_ISSUER = 0x20;
 
 const Hop = makeClass({
   static: {
@@ -30,27 +19,34 @@ const Hop = makeClass({
       if (value instanceof this) {
         return value;
       }
-      return _.transform(TYPES, (to, Type, k) => {
-        (value[k]) && (to[k] = Type.from(value[k]));
-      }, new this());
+      const hop = new Hop();
+      value.issuer && (hop.issuer = AccountID.from(value.issuer));
+      value.account && (hop.account = AccountID.from(value.account));
+      value.currency && (hop.currency = Currency.from(value.currency));
+      return hop;
     },
     parse(parser, type) {
-      return _.transform(TYPE, (to, v, k) => {
-        (type & v) && (to[k] = TYPES[k].fromParser(parser));
-      }, new this());
+      const hop = new Hop();
+      (type & TYPE_ACCOUNT) && (hop.account = AccountID.fromParser(parser));
+      (type & TYPE_CURRENCY) && (hop.currency = Currency.fromParser(parser));
+      (type & TYPE_ISSUER) && (hop.issuer = AccountID.fromParser(parser));
+      return hop;
     }
   },
   toJSON() {
-    const to = {type: this.type()};
-    _.forEach(HOP_PROPERTIES, (k) => {
-      (this[k]) && (to[k] = this[k].toJSON());
-    });
-    return to;
+    const type = this.type();
+    const ret = {type};
+    (type & TYPE_ACCOUNT) && (ret.account = this.account.toJSON());
+    (type & TYPE_ISSUER) && (ret.issuer = this.issuer.toJSON());
+    (type & TYPE_CURRENCY) && (ret.currency = this.currency.toJSON());
+    return ret;
   },
   type() {
-    return _.reduce(HOP_PROPERTIES, (a, b) => {
-      return a + (this[b] ? TYPE[b] : 0);
-    }, 0);
+    let type = 0;
+    this.issuer && (type += TYPE_ISSUER);
+    this.account && (type += TYPE_ACCOUNT);
+    this.currency && (type += TYPE_CURRENCY);
+    return type;
   }
 });
 
@@ -105,11 +101,9 @@ const PathSet = makeClass({
       }
       path.forEach((hop) => {
         sink.put([hop.type()]);
-        HOP_PROPERTIES.forEach(k => {
-          if (hop[k]) {
-            hop[k].toBytesSink(sink);
-          }
-        });
+        hop.account && (hop.account.toBytesSink(sink));
+        hop.currency && (hop.currency.toBytesSink(sink));
+        hop.issuer && (hop.issuer.toBytesSink(sink));
       });
     });
     sink.put([PATHSET_END_BYTE]);
