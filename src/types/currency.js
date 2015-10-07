@@ -25,7 +25,7 @@ function isHex(val) {
 }
 
 function isStringRepr(val) {
-  return _.isString(val) && (isHex(val) || isISOCode(val));
+  return _.isString(val) && (isISOCode(val) || isHex(val));
 }
 
 function isBytesArray(val) {
