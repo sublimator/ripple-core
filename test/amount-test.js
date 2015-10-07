@@ -21,4 +21,3 @@ describe('Amount', function() {
     assert.deepEqual(amt.toJSON(), rewritten);
   });
 });
-
