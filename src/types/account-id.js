@@ -8,12 +8,20 @@ const AccountID = makeClass({
   AccountID(bytes) {
     Hash160.call(this, bytes);
   },
-  extends: Hash160,
-  static: {
+  inherits: Hash160,
+  statics: {
     from(value) {
       return value instanceof this ? value :
               /^r/.test(value) ? this.fromBase58(value) :
                     new this(value);
+    },
+    cache: {},
+    fromCache(base58) {
+      let cached = this.cache[base58];
+      if (!cached) {
+        cached = this.cache[base58] = this.fromBase58(base58);
+      }
+      return cached;
     },
     fromBase58(value) {
       const acc = new this(decodeAccountID(value));
@@ -21,12 +29,12 @@ const AccountID = makeClass({
       return acc;
     }
   },
+  toJSON() {
+    return this.toBase58();
+  },
   cached: {
     toBase58() {
       return encodeAccountID(this._bytes);
-    },
-    toJSON() {
-      return this.toBase58();
     }
   }
 });

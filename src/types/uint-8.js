@@ -4,8 +4,8 @@ const makeClass = require('../utils/make-class');
 const {UInt} = require('./uint');
 
 const UInt8 = makeClass({
-  extends: UInt,
-  static: {width: 1}
+  inherits: UInt,
+  statics: {width: 1}
 });
 
 module.exports = {

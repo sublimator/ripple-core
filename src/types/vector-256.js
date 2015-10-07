@@ -5,9 +5,9 @@ const {Hash256} = require('./hash-256');
 const {ensureArrayLikeIs, SerializedType} = require('./serialized-type');
 
 const Vector256 = makeClass({
-  mixin: SerializedType,
-  extends: Array,
-  static: {
+  mixins: SerializedType,
+  inherits: Array,
+  statics: {
     fromParser(parser, hint) {
       const vector256 = new this();
       const bytes = hint !== null ? hint : parser.size() - parser.pos();

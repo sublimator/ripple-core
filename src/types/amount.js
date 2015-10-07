@@ -39,8 +39,8 @@ const Amount = makeClass({
     this.currency = currency || Currency.XRP;
     this.issuer = issuer || null;
   },
-  mixin: SerializedType,
-  static: {
+  mixins: SerializedType,
+  statics: {
     from(value) {
       if (value instanceof this) {
         return value;

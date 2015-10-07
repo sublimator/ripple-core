@@ -7,9 +7,9 @@ const {STObject} = require('./st-object');
 const {ArrayEndMarker} = Field;
 
 const STArray = makeClass({
-  mixin: SerializedType,
-  extends: Array,
-  static: {
+  mixins: SerializedType,
+  inherits: Array,
+  statics: {
     fromParser(parser) {
       const array = new STArray();
       while (!parser.end()) {

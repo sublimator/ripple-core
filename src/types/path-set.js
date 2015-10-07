@@ -14,7 +14,7 @@ const TYPE_CURRENCY = 0x10;
 const TYPE_ISSUER = 0x20;
 
 const Hop = makeClass({
-  static: {
+  statics: {
     from(value) {
       if (value instanceof this) {
         return value;
@@ -51,8 +51,8 @@ const Hop = makeClass({
 });
 
 const Path = makeClass({
-  extends: Array,
-  static: {
+  inherits: Array,
+  statics: {
     from(value) {
       return ensureArrayLikeIs(Path, value).withChildren(Hop);
     }
@@ -63,9 +63,9 @@ const Path = makeClass({
 });
 
 const PathSet = makeClass({
-  mixin: SerializedType,
-  extends: Array,
-  static: {
+  mixins: SerializedType,
+  inherits: Array,
+  statics: {
     from(value) {
       return ensureArrayLikeIs(PathSet, value).withChildren(Path);
     },

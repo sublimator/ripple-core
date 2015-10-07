@@ -25,7 +25,16 @@ function compareToTests() {
   check('UInt8.from(124).compareTo(13)', 1);
 }
 
+function valueOfTests() {
+  it('The Uint classes work with |= operator', function() {
+    let val = UInt8.from(1);
+    val |= 0x2;
+    assert.equal(val, 3);
+  });
+}
+
 describe('Uint*', function() {
   describe('compareToTests', compareToTests);
+  describe('valueOfTests', valueOfTests);
 });
 

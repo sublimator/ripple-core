@@ -12,8 +12,8 @@ const Hash = makeClass({
                           new Uint8Array(width);
     assert.equal(this._bytes.length, width);
   },
-  mixin: [Comparable, SerializedType],
-  static: {
+  mixins: [Comparable, SerializedType],
+  statics: {
     width: NaN,
     from(value) {
       if (value instanceof this) {

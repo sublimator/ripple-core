@@ -47,9 +47,9 @@ function bytesFromRepr(val) {
 
 const $uper = Hash160.prototype;
 const Currency = makeClass({
-  extends: Hash160,
+  inherits: Hash160,
   getters: ['isNative', 'iso'],
-  static: {
+  statics: {
     init() {
       this.XRP = new this(new Uint8Array(20));
     },

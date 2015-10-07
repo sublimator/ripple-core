@@ -9,8 +9,8 @@ const {ObjectEndMarker} = Field;
 const {SerializedType} = require('./serialized-type');
 
 const STObject = makeClass({
-  mixin: SerializedType,
-  static: {
+  mixins: SerializedType,
+  statics: {
     fromParser(parser, hint) {
       const end = typeof hint === 'number' ? parser.pos() + hint : null;
       const so = new this();

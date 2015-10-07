@@ -34,7 +34,7 @@ const EnumType = makeClass({
   toBytesSink(sink) {
     sink.put(this.bytes);
   },
-  static: {
+  statics: {
     ordinalByteWidth: 1,
     fromParser(parser) {
       return this.from(parser.readUIntN(this.ordinalByteWidth));
@@ -65,8 +65,8 @@ const EnumType = makeClass({
 
 function makeEnum(name, definition) {
   return makeClass({
-    extends: EnumType,
-    static: _.assign(definition, {enumName: name})
+    inherits: EnumType,
+    statics: _.assign(definition, {enumName: name})
   });
 }
 
@@ -90,8 +90,8 @@ const Enums = transformWith(makeEnums, {
 });
 
 Enums.Field = makeClass({
-  extends: EnumType,
-  static: {
+  inherits: EnumType,
+  statics: {
     enumName: 'Field',
     initVals: enums.FIELDS,
     valuesByName() {

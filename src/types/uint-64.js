@@ -9,8 +9,8 @@ const {UInt} = require('./uint');
 const HEX_REGEX = /^[A-F0-9]{16}$/;
 
 const UInt64 = makeClass({
-  extends: UInt,
-  static: {width: 8},
+  inherits: UInt,
+  statics: {width: 8},
   UInt64(arg = 0) {
     const argType = typeof arg;
     if (argType === 'number') {

@@ -24,7 +24,7 @@ module.exports = function makeClass(klass_, definition_) {
       }
     }
   }
-  const parent = definition.extends;
+  const parent = definition.inherits;
   if (parent) {
     if (klass === null) {
       klass = function() {
@@ -54,11 +54,11 @@ module.exports = function makeClass(klass_, definition_) {
   });
   forEach(definition.methods, addFunc);
   forEach(definition, f => {
-    if (typeof f === 'function' && f !== klass) {
+    if (_.isFunction(f) && f !== klass) {
       addFunc(f);
     }
   });
-  _.assign(klass, definition.static);
+  _.assign(klass, definition.statics);
   if (typeof klass.init === 'function') {
     klass.init();
   }
@@ -72,13 +72,13 @@ module.exports = function makeClass(klass_, definition_) {
       return value;
     });
   });
-  if (definition.mixin) {
-    const mixin = {};
+  if (definition.mixins) {
+    const mixins = {};
     // Right-most in the list win
-    ensureArray(definition.mixin).reverse().forEach(o => {
-      _.defaults(mixin, o);
+    ensureArray(definition.mixins).reverse().forEach(o => {
+      _.defaults(mixins, o);
     });
-    _.defaults(proto, mixin);
+    _.defaults(proto, mixins);
   }
 
   return klass;

@@ -22,7 +22,7 @@ const ShaMapNode = makeClass({
 });
 
 const ShaMapLeaf = makeClass({
-  extends: ShaMapNode,
+  inherits: ShaMapNode,
   ShaMapLeaf(index, item) {
     ShaMapNode.call(this);
     this.index = index;
@@ -46,7 +46,7 @@ const ShaMapLeaf = makeClass({
 const $uper = ShaMapNode.prototype;
 
 const ShaMapInner = makeClass({
-  extends: ShaMapNode,
+  inherits: ShaMapNode,
   ShaMapInner(depth = 0) {
     ShaMapNode.call(this);
     this.depth = depth;
@@ -102,7 +102,7 @@ const ShaMapInner = makeClass({
 });
 
 const ShaMap = makeClass({
-  extends: ShaMapInner
+  inherits: ShaMapInner
 });
 
 module.exports = {

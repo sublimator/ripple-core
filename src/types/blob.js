@@ -5,7 +5,7 @@ const {parseBytes, bytesToHex} = require('../utils/bytes-utils');
 const {SerializedType} = require('./serialized-type');
 
 const Blob = makeClass({
-  mixin: SerializedType,
+  mixins: SerializedType,
   Blob(bytes) {
     if (bytes) {
       this._bytes = parseBytes(bytes, Uint8Array);
@@ -13,7 +13,7 @@ const Blob = makeClass({
       this._bytes = new Uint8Array(0);
     }
   },
-  static: {
+  statics: {
     fromParser(parser, hint) {
       return new this(parser.read(hint));
     },

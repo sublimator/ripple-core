@@ -10,7 +10,7 @@ const Sha512Half = makeClass({
   Sha512Half() {
     this.hash = createHash('sha512');
   },
-  static: {
+  statics: {
     put(bytes) {
       return new this().put(bytes);
     }

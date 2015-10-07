@@ -12,7 +12,7 @@ function signum(a, b) {
 }
 
 const UInt = makeClass({
-  mixin: [Comparable, SerializedType],
+  mixins: [Comparable, SerializedType],
   UInt(val = 0) {
     const max = MAX_VALUES[this.constructor.width];
     if (val < 0 || !(val <= max)) {
@@ -20,7 +20,7 @@ const UInt = makeClass({
     }
     this.val = val;
   },
-  static: {
+  statics: {
     width: 0,
     fromParser(parser) {
       const val = this.width > 4 ? parser.read(this.width) :
